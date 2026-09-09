@@ -11,21 +11,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 authorize_request();
 $method = $_SERVER['REQUEST_METHOD'];
 $path = trim((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-$segments = explode('/', $path); $customerId = null; $productId = null; $quotationId = null; $paymentQuotationId = null;
+$segments = explode('/', $path); $customerId = null; $productId = null; $quotationId = null; $paymentQuotationId = null; $invoiceId = null;
 $customerPosition = array_search('customers', $segments, true);
 $productPosition = array_search('catalog', $segments, true);
 $quotationPosition = array_search('quotations', $segments, true);
 $paymentPosition = array_search('payments', $segments, true);
+$invoicePosition = array_search('invoices', $segments, true);
 if ($customerPosition !== false) $customerId = $segments[$customerPosition + 1] ?? null;
 if ($productPosition !== false) $productId = $segments[$productPosition + 1] ?? null;
 if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 1] ?? null;
 if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v8']);
+if ($invoicePosition !== false) $invoiceId = $segments[$invoicePosition + 1] ?? null;
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v9']);
 
 try {
     $pdo = database();
     if ($productPosition !== false) handle_catalog($pdo, $method, $productId);
     if ($paymentPosition !== false) handle_payments($pdo, $method, $paymentQuotationId);
+    if ($invoicePosition !== false) handle_invoices($pdo, $method, $invoiceId);
     if ($quotationPosition !== false) handle_quotations($pdo, $method, $quotationId);
     if ($method === 'GET' && !$customerId) {
         $query = trim($_GET['q'] ?? '');
@@ -177,3 +180,36 @@ function handle_payments(PDO $pdo, string $method, ?string $quotationId): never 
     }
     json_response(['message'=>'Payment route not found.'],404);
 }
+
+function handle_invoices(PDO $pdo, string $method, ?string $invoiceId): never {
+    if ($method === 'GET' && !$invoiceId) {
+        $stmt=$pdo->query('SELECT i.*,COALESCE(p.status,\'Unpaid\') payment_status,COALESCE(p.amount_paid,0) amount_paid FROM invoices i LEFT JOIN quotation_payments p ON p.quotation_id=i.quotation_id ORDER BY i.updated_at DESC');
+        json_response(['data'=>$stmt->fetchAll()]);
+    }
+    if ($method === 'GET' && $invoiceId) {
+        $stmt=$pdo->prepare('SELECT * FROM invoices WHERE id=:id');$stmt->execute(['id'=>$invoiceId]);$invoice=$stmt->fetch();
+        if(!$invoice)json_response(['message'=>'Invoice not found.'],404);
+        $items=$pdo->prepare('SELECT * FROM invoice_items WHERE invoice_id=:id ORDER BY line_order');$items->execute(['id'=>$invoiceId]);$invoice['items']=$items->fetchAll();json_response(['data'=>$invoice]);
+    }
+    if ($method === 'POST' && !$invoiceId) {
+        $body=request_body();$quotationId=trim((string)($body['quotationId']??''));
+        if($quotationId==='')json_response(['message'=>'Quotation is required.'],422);
+        $existing=$pdo->prepare('SELECT id,number FROM invoices WHERE quotation_id=:id');$existing->execute(['id'=>$quotationId]);
+        if($invoice=$existing->fetch())json_response(['data'=>$invoice,'message'=>'Invoice already exists.']);
+        $quoteStmt=$pdo->prepare('SELECT * FROM quotations WHERE id=:id AND status=\'Accepted\'');$quoteStmt->execute(['id'=>$quotationId]);$quote=$quoteStmt->fetch();
+        if(!$quote)json_response(['message'=>'Accepted quotation not found.'],422);
+        $items=$pdo->prepare('SELECT * FROM quotation_items WHERE quotation_id=:id ORDER BY line_order');$items->execute(['id'=>$quotationId]);$lines=$items->fetchAll();
+        $pdo->beginTransaction();
+        try {
+            $id='INV-'.strtoupper(bin2hex(random_bytes(6)));$number=next_invoice_number($pdo);$issue=date('Y-m-d');$due=date('Y-m-d',strtotime('+15 days'));
+            $stmt=$pdo->prepare('INSERT INTO invoices (id,number,quotation_id,quotation_number,customer_id,customer_name,customer_business,issue_date,due_date,discount_rate,subtotal,discount_amount,taxable_amount,tax_amount,grand_total,notes,terms) VALUES (:id,:number,:quotation_id,:quotation_number,:customer_id,:customer_name,:customer_business,:issue_date,:due_date,:discount_rate,:subtotal,:discount_amount,:taxable_amount,:tax_amount,:grand_total,:notes,:terms)');
+            $stmt->execute(['id'=>$id,'number'=>$number,'quotation_id'=>$quotationId,'quotation_number'=>$quote['number'],'customer_id'=>$quote['customer_id'],'customer_name'=>$quote['customer_name'],'customer_business'=>$quote['customer_business'],'issue_date'=>$issue,'due_date'=>$due,'discount_rate'=>$quote['discount_rate'],'subtotal'=>$quote['subtotal'],'discount_amount'=>$quote['discount_amount'],'taxable_amount'=>$quote['taxable_amount'],'tax_amount'=>$quote['tax_amount'],'grand_total'=>$quote['grand_total'],'notes'=>$quote['notes'],'terms'=>$quote['terms']]);
+            $line=$pdo->prepare('INSERT INTO invoice_items (id,invoice_id,line_order,catalog_item_id,name,description,quantity,unit,rate,tax_rate,amount,tax_amount,total) VALUES (:id,:invoice_id,:line_order,:catalog_item_id,:name,:description,:quantity,:unit,:rate,:tax_rate,:amount,:tax_amount,:total)');
+            foreach($lines as $item){$line->execute(['id'=>'ILI-'.strtoupper(bin2hex(random_bytes(6))),'invoice_id'=>$id,'line_order'=>$item['line_order'],'catalog_item_id'=>$item['catalog_item_id'],'name'=>$item['name'],'description'=>$item['description'],'quantity'=>$item['quantity'],'unit'=>$item['unit'],'rate'=>$item['rate'],'tax_rate'=>$item['tax_rate'],'amount'=>$item['amount'],'tax_amount'=>$item['tax_amount'],'total'=>$item['total']]);}
+            $pdo->commit();json_response(['data'=>['id'=>$id,'number'=>$number],'message'=>'Invoice created.'],201);
+        } catch(Throwable $error){$pdo->rollBack();throw $error;}
+    }
+    json_response(['message'=>'Invoice route not found.'],404);
+}
+
+function next_invoice_number(PDO $pdo):string{$year=date('Y');$stmt=$pdo->prepare('SELECT number FROM invoices WHERE number LIKE :prefix ORDER BY number DESC LIMIT 1 FOR UPDATE');$stmt->execute(['prefix'=>"INV-{$year}-%"]);$last=$stmt->fetchColumn();$next=$last?(int)substr((string)$last,-3)+1:1;return sprintf('INV-%s-%03d',$year,$next);}

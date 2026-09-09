@@ -1,0 +1,160 @@
+:host {
+  --ink: #15213b;
+  --muted: #75809a;
+  display: block;
+}
+ion-content {
+  --background: #f5f7fb;
+}
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: calc(20px + var(--ion-safe-area-top)) 18px 50px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+.header p,
+.header h1 {
+  margin: 0;
+}
+.header p {
+  color: #98a0b2;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+.header h1 {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 22px;
+}
+.back {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e1e5ed;
+  border-radius: 14px;
+  color: var(--ink);
+  background: #fff;
+  font-size: 19px;
+}
+.count {
+  margin-left: auto;
+  padding: 7px 10px;
+  border-radius: 10px;
+  color: #3768ed;
+  background: #eaf0ff;
+  font-size: 10px;
+  font-weight: 800;
+}
+.invoice-list {
+  overflow: hidden;
+  border: 1px solid #e5e9f1;
+  border-radius: 20px;
+  background: #fff;
+}
+.invoice-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 13px;
+  border-bottom: 1px solid #edf0f5;
+  color: var(--ink);
+  text-decoration: none;
+}
+.invoice-row:last-child {
+  border-bottom: 0;
+}
+.invoice-row > .icon {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #3768ed;
+  background: #eaf0ff;
+  font-size: 19px;
+}
+.info {
+  flex: 1;
+  min-width: 0;
+}
+.info strong,
+.info small,
+.amount strong,
+.amount small {
+  display: block;
+}
+.info strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.info small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+}
+.amount {
+  text-align: right;
+}
+.amount strong {
+  font-size: 11px;
+}
+.amount small {
+  margin-top: 4px;
+  font-size: 7px;
+  font-weight: 800;
+}
+.amount .paid {
+  color: #249a63;
+}
+.amount .partial {
+  color: #d18428;
+}
+.amount .unpaid {
+  color: #d34d5d;
+}
+.invoice-row > ion-icon {
+  color: #b2b9c8;
+}
+.empty {
+  padding: 58px 24px;
+  border: 1px solid #e6eaf1;
+  border-radius: 22px;
+  text-align: center;
+  background: #fff;
+}
+.empty > ion-icon {
+  color: #3768ed;
+  font-size: 42px;
+}
+.empty h2 {
+  margin: 12px 0 5px;
+  color: var(--ink);
+  font-size: 17px;
+}
+.empty p {
+  margin: 0 auto 16px;
+  max-width: 260px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.empty a {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 11px;
+  color: #fff;
+  background: #3768ed;
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+}

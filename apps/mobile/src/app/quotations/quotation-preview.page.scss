@@ -106,6 +106,23 @@ ion-content {
   font-size: 9px;
   font-weight: 700;
 }
+.status-panel .invoice-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 0;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: #fff;
+  background: #249a63;
+  font-size: 9px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.status-panel .invoice-button:disabled {
+  opacity: 0.42;
+}
 .status-actions {
   display: flex;
   gap: 7px;

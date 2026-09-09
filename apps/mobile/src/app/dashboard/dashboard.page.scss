@@ -235,7 +235,8 @@ button {
   border-color: #d9e2ff;
   background: #f8faff;
 }
-.quick-card.catalogue {
+.quick-card.catalogue,
+.quick-card.invoice {
   grid-column: 1 / -1;
 }
 .quick-icon {

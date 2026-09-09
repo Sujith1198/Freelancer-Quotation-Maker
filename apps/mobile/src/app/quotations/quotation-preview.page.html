@@ -25,6 +25,19 @@
       >}<button (click)="duplicate()">
         <ion-icon name="copy-outline" /> Duplicate
       </button>
+      @if(convertedInvoice();as invoice){
+      <a class="invoice-button" [routerLink]="['/invoices',invoice.id]">
+        <ion-icon name="receipt-outline" /> {{ invoice.number }}
+      </a>
+      }@else{
+      <button
+        class="invoice-button"
+        [disabled]="document.status!=='Accepted'"
+        (click)="convertToInvoice()"
+      >
+        <ion-icon name="receipt-outline" /> Create invoice
+      </button>
+      }
     </section>
     <div class="status-actions">
       @for(status of statuses;track status){<button

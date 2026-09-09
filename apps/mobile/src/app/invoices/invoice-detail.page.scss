@@ -1,0 +1,293 @@
+:host {
+  --ink: #15213b;
+  --muted: #75809a;
+  display: block;
+}
+ion-content {
+  --background: #eef1f7;
+}
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: calc(18px + var(--ion-safe-area-top)) 18px 50px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 15px;
+}
+.header p,
+.header h1 {
+  margin: 0;
+}
+.header p {
+  color: #98a0b2;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+.header h1 {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 21px;
+}
+.back {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dfe3eb;
+  border-radius: 14px;
+  color: var(--ink);
+  background: #fff;
+  font-size: 19px;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #dce2ee;
+  border-radius: 11px;
+  padding: 10px 13px;
+  color: #566277;
+  background: #fff;
+  font-size: 9px;
+  font-weight: 800;
+}
+.actions .receipt {
+  margin-left: auto;
+  border-color: #2aa36b;
+  color: #fff;
+  background: #2aa36b;
+}
+.actions button:disabled {
+  opacity: 0.45;
+}
+.invoice-paper {
+  padding: 34px;
+  border-radius: 9px;
+  color: #25314a;
+  background: #fff;
+  box-shadow: 0 13px 35px rgba(36, 48, 78, 0.1);
+}
+.invoice-head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 23px;
+  border-bottom: 2px solid #315fdc;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.brand > span {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #fff;
+  background: #3768ed;
+  font-size: 19px;
+  font-weight: 800;
+}
+.brand h2,
+.brand p {
+  margin: 0;
+}
+.brand h2 {
+  font-size: 15px;
+}
+.brand p {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+}
+.title {
+  text-align: right;
+}
+.title strong,
+.title span {
+  display: block;
+}
+.title strong {
+  color: #315fdc;
+  font-size: 20px;
+  letter-spacing: 1.5px;
+}
+.title span {
+  margin-top: 5px;
+  color: #68738a;
+  font-size: 9px;
+}
+.meta {
+  display: flex;
+  justify-content: space-between;
+  padding: 23px 0;
+}
+.meta small {
+  color: #98a0b0;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.meta > div:first-child strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.meta p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 8px;
+}
+.meta > div:last-child p {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+}
+.meta > div:last-child strong {
+  color: var(--ink);
+}
+.table-wrap {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8px;
+}
+th {
+  padding: 10px 8px;
+  text-align: right;
+  color: #fff;
+  background: #315fdc;
+}
+th:nth-child(2),
+td:nth-child(2) {
+  text-align: left;
+}
+td {
+  padding: 11px 8px;
+  border-bottom: 1px solid #e9ecf2;
+  text-align: right;
+}
+td strong,
+td small {
+  display: block;
+}
+td small {
+  margin-top: 3px;
+  color: #8b94a6;
+}
+.totals {
+  width: 250px;
+  margin: 22px 0 0 auto;
+}
+.totals p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 6px 9px;
+  font-size: 8px;
+}
+.totals .grand {
+  margin-top: 4px;
+  padding: 11px;
+  color: #fff;
+  background: #315fdc;
+  font-size: 11px;
+}
+.payment-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 13px;
+  border-radius: 13px;
+  color: #ad6b20;
+  background: #fff5e6;
+}
+.payment-strip.paid {
+  color: #207f56;
+  background: #eaf9f1;
+}
+.payment-strip > ion-icon {
+  font-size: 24px;
+}
+.payment-strip div {
+  flex: 1;
+}
+.payment-strip small,
+.payment-strip div strong {
+  display: block;
+}
+.payment-strip small {
+  font-size: 7px;
+}
+.payment-strip div strong {
+  margin-top: 2px;
+  font-size: 11px;
+}
+.payment-strip p {
+  margin: 0;
+  text-align: right;
+}
+.payment-strip p span,
+.payment-strip p strong {
+  display: block;
+}
+.payment-strip p span {
+  font-size: 7px;
+}
+.payment-strip p strong {
+  margin-top: 3px;
+  font-size: 10px;
+}
+@media (max-width: 600px) {
+  .page {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .invoice-paper {
+    padding: 20px 14px;
+  }
+  .invoice-head {
+    display: block;
+  }
+  .title {
+    text-align: left;
+    margin-top: 18px;
+  }
+  .meta {
+    gap: 18px;
+  }
+  .actions button {
+    flex: 1;
+    padding: 10px 6px;
+  }
+  .actions .receipt {
+    margin-left: 0;
+  }
+  .payment-strip {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .payment-strip div {
+    min-width: calc(100% - 40px);
+  }
+  .payment-strip p {
+    flex: 1;
+  }
+  .totals {
+    width: auto;
+  }
+}

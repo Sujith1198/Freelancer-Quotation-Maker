@@ -20,6 +20,7 @@ import {
   checkmarkDoneOutline,
   printOutline,
   qrCodeOutline,
+  receiptOutline,
   personOutline,
   shareSocialOutline,
   timeOutline,
@@ -28,6 +29,7 @@ import { BusinessProfileService } from '../business-profile/business-profile.ser
 import { CustomerService } from '../customers/customer.service';
 import { PaymentRecord } from '../payments/payment.model';
 import { PaymentService } from '../payments/payment.service';
+import { InvoiceService } from '../invoices/invoice.service';
 import { Quotation, QuotationStatus } from './quotation.model';
 import { PdfTemplate, QuotationPdfService } from './quotation-pdf.service';
 import { QuotationService } from './quotation.service';
@@ -54,6 +56,7 @@ export class QuotationPreviewPage {
   private readonly toasts = inject(ToastController);
   private readonly pdf = inject(QuotationPdfService);
   private readonly payments = inject(PaymentService);
+  private readonly invoices = inject(InvoiceService);
   readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   readonly quote = signal<Quotation | undefined>(this.service.find(this.id));
   readonly pdfTemplate = signal<PdfTemplate>('modern');
@@ -62,6 +65,7 @@ export class QuotationPreviewPage {
   readonly paymentQr = signal('');
   readonly paidAmount = signal(this.payment().amountPaid);
   readonly paymentReference = signal(this.payment().transactionReference);
+  readonly convertedInvoice = signal(this.invoices.findByQuotation(this.id));
   readonly business = inject(BusinessProfileService).get();
   readonly customer = this.customers.find(this.quote()?.customerId ?? '');
   readonly statuses: QuotationStatus[] = [
@@ -83,6 +87,7 @@ export class QuotationPreviewPage {
       checkmarkDoneOutline,
       printOutline,
       qrCodeOutline,
+      receiptOutline,
       personOutline,
       shareSocialOutline,
       timeOutline,
@@ -185,6 +190,18 @@ export class QuotationPreviewPage {
     this.paymentReference.set('');
     await this.refreshPaymentQr();
     await this.notice('Payment reset to Unpaid');
+  }
+  async convertToInvoice(): Promise<void> {
+    const quote = this.quote();
+    if (!quote) return;
+    if (quote.status !== 'Accepted') {
+      await this.notice('Accept the quotation before creating an invoice');
+      return;
+    }
+    const invoice = this.invoices.createFromQuotation(quote);
+    this.convertedInvoice.set(invoice);
+    await this.notice(`Invoice ${invoice.number} ready`, 'success');
+    await this.router.navigate(['/invoices', invoice.id]);
   }
   private async refreshPaymentQr(): Promise<void> {
     const quote = this.quote();

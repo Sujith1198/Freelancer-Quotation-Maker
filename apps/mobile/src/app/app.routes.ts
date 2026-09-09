@@ -71,5 +71,25 @@ export const appRoutes: Routes = [
         (m) => m.QuotationPreviewPage,
       ),
   },
+  {
+    path: 'invoices',
+    loadComponent: () =>
+      import('./invoices/invoice-list.page').then((m) => m.InvoiceListPage),
+  },
+  {
+    path: 'invoices/:id',
+    loadComponent: () =>
+      import('./invoices/invoice-detail.page').then((m) => m.InvoiceDetailPage),
+  },
+  {
+    path: 'invoices',
+    loadComponent: () =>
+      import('./invoices/invoice-list.page').then((m) => m.InvoiceListPage),
+  },
+  {
+    path: 'invoices/:id',
+    loadComponent: () =>
+      import('./invoices/invoice-detail.page').then((m) => m.InvoiceDetailPage),
+  },
   { path: '**', redirectTo: '' },
 ];

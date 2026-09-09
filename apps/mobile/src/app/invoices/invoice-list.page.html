@@ -1,0 +1,44 @@
+<ion-content [fullscreen]="true">
+  <main class="page">
+    <header class="header">
+      <a class="back" routerLink="/"><ion-icon name="arrow-back" /></a>
+      <div>
+        <p>BILLING</p>
+        <h1>Invoices</h1>
+      </div>
+      <span class="count">{{ items().length }}</span>
+    </header>
+    @if(items().length){
+    <section class="invoice-list">
+      @for(invoice of items();track invoice.id){
+      <a class="invoice-row" [routerLink]="['/invoices',invoice.id]">
+        <span class="icon"><ion-icon name="receipt-outline" /></span>
+        <div class="info">
+          <strong>{{ invoice.customerName }}</strong>
+          <small
+            >{{ invoice.number }} · {{ invoice.issueDate|date:'d MMM y'
+            }}</small
+          >
+        </div>
+        <div class="amount">
+          <strong
+            >{{ invoice.grandTotal|currency:'INR':'symbol':'1.0-2' }}</strong
+          >
+          <small [class]="paymentStatus(invoice).toLowerCase()"
+            >{{ paymentStatus(invoice) }}</small
+          >
+        </div>
+        <ion-icon name="chevron-forward" />
+      </a>
+      }
+    </section>
+    }@else{
+    <section class="empty">
+      <ion-icon name="document-text-outline" />
+      <h2>No invoices yet</h2>
+      <p>Open an accepted quotation and convert it to an invoice.</p>
+      <a routerLink="/quotations">View quotations</a>
+    </section>
+    }
+  </main>
+</ion-content>

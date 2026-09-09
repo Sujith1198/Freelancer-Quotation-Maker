@@ -1,0 +1,128 @@
+<ion-content [fullscreen]="true">
+  <main class="page">
+    <header class="header">
+      <a class="back" routerLink="/invoices"><ion-icon name="arrow-back" /></a>
+      <div>
+        <p>INVOICE</p>
+        <h1>{{ invoice?.number || 'Not found' }}</h1>
+      </div>
+    </header>
+    @if(invoice;as document){
+    <section class="actions">
+      <button (click)="download('invoice')">
+        <ion-icon name="download-outline" /> Invoice PDF
+      </button>
+      <button (click)="print()"><ion-icon name="print-outline" /> Print</button>
+      <button
+        class="receipt"
+        (click)="download('receipt')"
+        [disabled]="payment.amountPaid<=0"
+      >
+        <ion-icon name="receipt-outline" /> Receipt
+      </button>
+    </section>
+    <article class="invoice-paper">
+      <header class="invoice-head">
+        <div class="brand">
+          <span>{{ (business.businessName||'Q').charAt(0) }}</span>
+          <div>
+            <h2>{{ business.businessName||'Your Business' }}</h2>
+            <p>
+              {{ business.city }} {{ business.gstin?'· GSTIN '+business.gstin:''
+              }}
+            </p>
+          </div>
+        </div>
+        <div class="title">
+          <strong>TAX INVOICE</strong><span>{{ document.number }}</span>
+        </div>
+      </header>
+      <section class="meta">
+        <div>
+          <small>BILL TO</small><strong>{{ document.customerName }}</strong>
+          <p>{{ document.customerBusiness }}</p>
+        </div>
+        <div>
+          <p>
+            <span>Invoice date</span
+            ><strong>{{ document.issueDate|date:'d MMM y' }}</strong>
+          </p>
+          <p>
+            <span>Due date</span
+            ><strong>{{ document.dueDate|date:'d MMM y' }}</strong>
+          </p>
+          <p>
+            <span>From quote</span
+            ><strong>{{ document.quotationNumber }}</strong>
+          </p>
+        </div>
+      </section>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th>GST</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(item of document.items;track item.id;let i=$index){
+            <tr>
+              <td>{{i+1}}</td>
+              <td>
+                <strong>{{item.name}}</strong
+                ><small>{{item.description}}</small>
+              </td>
+              <td>{{item.quantity}} {{item.unit}}</td>
+              <td>{{item.rate|currency:'INR':'symbol':'1.0-2'}}</td>
+              <td>{{item.taxRate}}%</td>
+              <td>{{item.amount|currency:'INR':'symbol':'1.0-2'}}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <section class="totals">
+        <p>
+          <span>Subtotal</span
+          ><strong
+            >{{ document.subtotal|currency:'INR':'symbol':'1.0-2' }}</strong
+          >
+        </p>
+        <p>
+          <span>GST</span
+          ><strong
+            >{{ document.taxAmount|currency:'INR':'symbol':'1.0-2' }}</strong
+          >
+        </p>
+        <p class="grand">
+          <span>Total</span
+          ><strong
+            >{{ document.grandTotal|currency:'INR':'symbol':'1.0-2' }}</strong
+          >
+        </p>
+      </section>
+      <section class="payment-strip" [class.paid]="payment.status==='Paid'">
+        <ion-icon
+          [name]="payment.status==='Paid'?'checkmark-circle':'receipt-outline'"
+        />
+        <div><small>PAYMENT</small><strong>{{ payment.status }}</strong></div>
+        <p>
+          <span>Received</span
+          ><strong
+            >{{ payment.amountPaid|currency:'INR':'symbol':'1.0-2' }}</strong
+          >
+        </p>
+        <p>
+          <span>Balance</span
+          ><strong>{{ balanceDue|currency:'INR':'symbol':'1.0-2' }}</strong>
+        </p>
+      </section>
+    </article>
+    }
+  </main>
+</ion-content>
