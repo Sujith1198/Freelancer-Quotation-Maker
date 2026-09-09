@@ -1,0 +1,93 @@
+<ion-content [fullscreen]="true"
+  ><main class="page">
+    <header class="header">
+      <a class="back ion-activatable" routerLink="/"
+        ><ion-icon name="arrow-back" /><ion-ripple-effect
+      /></a>
+      <div>
+        <p>ITEM MASTER</p>
+        <h1>Products & services</h1>
+      </div>
+      <a class="add ion-activatable" routerLink="/catalog/new"
+        ><ion-icon name="add" /><ion-ripple-effect
+      /></a>
+    </header>
+    <section class="summary">
+      <div>
+        <span><ion-icon name="cube-outline" /></span
+        ><strong>{{ productCount() }}</strong><small>Products</small>
+      </div>
+      <div>
+        <span><ion-icon name="briefcase-outline" /></span
+        ><strong>{{ serviceCount() }}</strong><small>Services</small>
+      </div>
+      <p>Reusable items make quotations faster and consistent.</p>
+    </section>
+    <label class="search"
+      ><ion-icon name="search-outline" /><input
+        type="search"
+        placeholder="Search name, code or HSN/SAC"
+        [value]="query()"
+        (input)="updateSearch($event)"
+    /></label>
+    <div class="filters">
+      <button [class.active]="filter()==='all'" (click)="setFilter('all')">
+        All</button
+      ><button
+        [class.active]="filter()==='product'"
+        (click)="setFilter('product')"
+      >
+        Products</button
+      ><button
+        [class.active]="filter()==='service'"
+        (click)="setFilter('service')"
+      >
+        Services
+      </button>
+    </div>
+    @if(filteredItems().length){
+    <div class="item-list">
+      @for(item of filteredItems();track item.id){<a
+        class="item-row"
+        [routerLink]="['/catalog',item.id,'edit']"
+        ><div class="item-icon" [class.service]="item.type==='service'">
+          <ion-icon
+            [name]="item.type==='product'?'cube-outline':'briefcase-outline'"
+          />
+        </div>
+        <div class="info">
+          <strong>{{ item.name }}</strong
+          ><span
+            >{{ item.code || (item.type | titlecase) }} · per {{ item.unit
+            }}</span
+          ><small
+            >GST {{ item.taxRate }}% @if(item.hsnSac){ · {{ item.hsnSac }}
+            }</small
+          >
+        </div>
+        <div class="price">
+          <strong>{{ item.rate | currency:'INR':'symbol':'1.0-2' }}</strong
+          ><span [class.inactive]="!item.active"
+            >{{ item.active?'Active':'Inactive' }}</span
+          >
+        </div>
+        <button class="delete" (click)="confirmDelete(item,$event)">
+          <ion-icon name="trash-outline" /></button
+        ><ion-icon class="chevron" name="chevron-forward" /></a
+      >}
+    </div>
+    }@else{
+    <section class="empty">
+      <div><ion-icon name="cube-outline" /></div>
+      <h2>
+        {{ query()||filter()!=='all'?'No matching items':'Create your first
+        item' }}
+      </h2>
+      <p>Add products and services once, then reuse them in every quotation.</p>
+      @if(!query()&&filter()==='all'){<a routerLink="/catalog/new"
+        ><ion-icon name="add" /> Add item</a
+      >}
+    </section>
+    }
+  </main></ion-content
+>

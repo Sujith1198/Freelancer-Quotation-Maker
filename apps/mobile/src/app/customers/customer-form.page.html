@@ -1,0 +1,141 @@
+<ion-content [fullscreen]="true"
+  ><main class="page">
+    <header class="header">
+      <a class="back ion-activatable" routerLink="/customers"
+        ><ion-icon name="arrow-back" /><ion-ripple-effect
+      /></a>
+      <div>
+        <p>CUSTOMERS</p>
+        <h1>{{ customerId ? 'Edit customer' : 'New customer' }}</h1>
+      </div>
+    </header>
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="person-outline" /></span>
+          <div>
+            <h2>Contact details</h2>
+            <p>Information used in quotations</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="name">Customer name <b>*</b></label
+          ><input
+            id="name"
+            formControlName="name"
+            placeholder="Full name"
+          />@if(hasError('name','required')){<small
+            >Customer name is required.</small
+          >}
+        </div>
+        <div class="field">
+          <label for="businessName">Business name</label
+          ><input
+            id="businessName"
+            formControlName="businessName"
+            placeholder="Company or shop name"
+          />
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="phone">Phone <b>*</b></label>
+            <div class="prefix">
+              <span>+91</span
+              ><input
+                id="phone"
+                inputmode="numeric"
+                maxlength="10"
+                formControlName="phone"
+                placeholder="9876543210"
+              />
+            </div>
+            @if(hasError('phone','pattern')){<small
+              >Enter a valid Indian mobile number.</small
+            >}
+          </div>
+          <div class="field">
+            <label for="email">Email</label
+            ><input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="customer@email.com"
+            />@if(hasError('email','email')){<small>Enter a valid email.</small
+            >}
+          </div>
+        </div>
+        <div class="field">
+          <label for="gstin">GSTIN <em>Optional</em></label
+          ><input
+            id="gstin"
+            class="uppercase"
+            maxlength="15"
+            formControlName="gstin"
+            placeholder="33ABCDE1234F1Z5"
+          />@if(hasError('gstin','pattern')){<small>Enter a valid GSTIN.</small
+          >}
+        </div>
+      </section>
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="location-outline" /></span>
+          <div>
+            <h2>Billing address</h2>
+            <p>Optional address for quotation</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="address">Address</label
+          ><textarea
+            id="address"
+            rows="3"
+            formControlName="address"
+            placeholder="Door number, street and area"
+          ></textarea>
+        </div>
+        <div class="two">
+          <div class="field">
+            <label for="city">City</label
+            ><input id="city" formControlName="city" placeholder="Chennai" />
+          </div>
+          <div class="field">
+            <label for="state">State</label
+            ><input id="state" formControlName="state" />
+          </div>
+        </div>
+        <div class="field half">
+          <label for="postalCode">PIN code</label
+          ><input
+            id="postalCode"
+            inputmode="numeric"
+            maxlength="6"
+            formControlName="postalCode"
+            placeholder="600001"
+          />@if(hasError('postalCode','pattern')){<small
+            >Enter a valid 6-digit PIN.</small
+          >}
+        </div>
+      </section>
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="reader-outline" /></span>
+          <div>
+            <h2>Notes</h2>
+            <p>Private information about this customer</p>
+          </div>
+        </div>
+        <div class="field">
+          <textarea
+            rows="4"
+            formControlName="notes"
+            placeholder="Payment preference, project details, etc."
+          ></textarea>
+        </div>
+      </section>
+      <ion-button type="submit" expand="block" size="large"
+        ><ion-icon slot="start" name="checkmark-circle" />{{ customerId ?
+        'Update customer' : 'Save customer' }}</ion-button
+      >
+    </form>
+  </main></ion-content
+>

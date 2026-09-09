@@ -235,6 +235,9 @@ button {
   border-color: #d9e2ff;
   background: #f8faff;
 }
+.quick-card.catalogue {
+  grid-column: 1 / -1;
+}
 .quick-icon {
   flex: 0 0 36px;
   width: 36px;

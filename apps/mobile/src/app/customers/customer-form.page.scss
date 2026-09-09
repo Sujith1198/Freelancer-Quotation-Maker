@@ -1,0 +1,187 @@
+:host {
+  --ink: #15213b;
+  --muted: #75809a;
+  display: block;
+}
+ion-content {
+  --background: #f5f7fb;
+}
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: calc(18px + var(--ion-safe-area-top)) 20px
+    calc(32px + var(--ion-safe-area-bottom));
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 23px;
+}
+.header p,
+.header h1 {
+  margin: 0;
+}
+.header p {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #98a0b2;
+  font-weight: 800;
+}
+.header h1 {
+  font-size: 22px;
+  color: var(--ink);
+  margin-top: 3px;
+}
+.back {
+  position: relative;
+  overflow: hidden;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e7eaf1;
+  background: #fff;
+  color: var(--ink);
+  font-size: 20px;
+}
+.form-card {
+  margin-top: 16px;
+  padding: 19px;
+  border: 1px solid #e8ebf2;
+  border-radius: 22px;
+  background: #fff;
+}
+.card-title {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 17px;
+  border-bottom: 1px solid #eef0f5;
+}
+.card-title > span {
+  width: 37px;
+  height: 37px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #eaf0ff;
+  color: #3768ed;
+  font-size: 19px;
+}
+.card-title h2,
+.card-title p {
+  margin: 0;
+}
+.card-title h2 {
+  font-size: 14px;
+  color: var(--ink);
+}
+.card-title p {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.field {
+  margin-bottom: 15px;
+}
+.field:last-child {
+  margin-bottom: 0;
+}
+.field label {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 2px 7px;
+  color: #34405a;
+  font-size: 10px;
+  font-weight: 700;
+}
+.field b {
+  color: #ee5263;
+}
+.field em {
+  font-style: normal;
+  color: #a0a7b5;
+  font-weight: 500;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid #dfe3ec;
+  border-radius: 13px;
+  padding: 12px 13px;
+  background: #fbfcfe;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: #6e94f5;
+  box-shadow: 0 0 0 3px rgba(55, 104, 237, 0.09);
+  background: #fff;
+}
+.field textarea {
+  resize: vertical;
+}
+.field small {
+  display: block;
+  color: #d93445;
+  font-size: 9px;
+  margin: 5px 3px 0;
+}
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.half {
+  width: calc(50% - 6px);
+}
+.prefix {
+  display: flex;
+  border: 1px solid #dfe3ec;
+  border-radius: 13px;
+  overflow: hidden;
+}
+.prefix span {
+  padding: 12px 10px;
+  color: #707a90;
+  background: #f0f3f8;
+  font-size: 11px;
+}
+.prefix input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+form > ion-button {
+  --background: #3768ed;
+  --border-radius: 15px;
+  --box-shadow: 0 10px 22px rgba(55, 104, 237, 0.24);
+  height: 54px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 18px;
+}
+@media (max-width: 500px) {
+  .page {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .form-card {
+    padding: 16px;
+  }
+  .two {
+    grid-template-columns: 1fr;
+  }
+  .half {
+    width: 100%;
+  }
+}

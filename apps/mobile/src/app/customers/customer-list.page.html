@@ -1,0 +1,75 @@
+<ion-content [fullscreen]="true">
+  <main class="page">
+    <header class="header">
+      <a class="back ion-activatable" routerLink="/"
+        ><ion-icon name="arrow-back" /><ion-ripple-effect
+      /></a>
+      <div>
+        <p>CONTACTS</p>
+        <h1>Customers</h1>
+      </div>
+      <a class="add ion-activatable" routerLink="/customers/new"
+        ><ion-icon name="add" /><ion-ripple-effect
+      /></a>
+    </header>
+    <section class="summary">
+      <span><ion-icon name="people-outline" /></span>
+      <div>
+        <strong>{{ customers().length }}</strong><small>Total customers</small>
+      </div>
+      <p>Build your client list and create quotations faster.</p>
+    </section>
+    <label class="search"
+      ><ion-icon name="search-outline" /><input
+        type="search"
+        placeholder="Search name, phone or business"
+        [value]="query()"
+        (input)="updateSearch($event)"
+    /></label>
+    @if (filteredCustomers().length) {
+    <div class="customer-list">
+      @for (customer of filteredCustomers(); track customer.id) {
+      <a
+        class="customer-row"
+        [routerLink]="['/customers', customer.id, 'edit']"
+      >
+        <div class="avatar">{{ customer.name.charAt(0).toUpperCase() }}</div>
+        <div class="info">
+          <strong>{{ customer.name }}</strong
+          ><span>{{ customer.businessName || customer.phone }}</span
+          ><small>{{ customer.city || customer.email }}</small>
+        </div>
+        <div class="actions">
+          <a
+            class="action"
+            [href]="'tel:+91' + customer.phone"
+            (click)="$event.stopPropagation()"
+            ><ion-icon name="call-outline"
+          /></a>
+          <button
+            class="action delete"
+            (click)="confirmDelete(customer,$event)"
+          >
+            <ion-icon name="trash-outline" />
+          </button>
+        </div>
+        <ion-icon class="chevron" name="chevron-forward" />
+      </a>
+      }
+    </div>
+    } @else {
+    <section class="empty">
+      <div><ion-icon name="business-outline" /></div>
+      <h2>
+        {{ query() ? 'No matching customers' : 'Add your first customer' }}
+      </h2>
+      <p>
+        {{ query() ? 'Try another name, phone number or business.' : 'Customer
+        details will be ready whenever you create a quotation.' }}
+      </p>
+      @if (!query()) {
+      <a routerLink="/customers/new"><ion-icon name="add" /> Add customer</a> }
+    </section>
+    }
+  </main>
+</ion-content>

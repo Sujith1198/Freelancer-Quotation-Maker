@@ -62,7 +62,7 @@
             name="chevron-forward"
           /><ion-ripple-effect />
         </button>
-        <button class="quick-card ion-activatable">
+        <button class="quick-card ion-activatable" routerLink="/customers/new">
           <span class="quick-icon"><ion-icon name="people-outline" /></span
           ><span
             ><strong>Add customer</strong
@@ -71,6 +71,18 @@
             class="arrow"
             name="chevron-forward"
           /><ion-ripple-effect />
+        </button>
+        <button
+          class="quick-card catalogue ion-activatable"
+          routerLink="/catalog"
+        >
+          <span class="quick-icon"><ion-icon name="cube-outline" /></span>
+          <span
+            ><strong>Products & services</strong
+            ><small>Manage rates, units and GST</small></span
+          >
+          <ion-icon class="arrow" name="chevron-forward" />
+          <ion-ripple-effect />
         </button>
       </div>
     </section>
@@ -133,7 +145,7 @@
     <button class="create-button" aria-label="Create quotation">
       <ion-icon name="add" />
     </button>
-    <button class="nav-item">
+    <button class="nav-item" routerLink="/customers">
       <ion-icon name="people-outline" /><span>Customers</span>
     </button>
     <button class="nav-item" routerLink="/business-profile">
