@@ -15,12 +15,16 @@ import {
   copyOutline,
   createOutline,
   documentTextOutline,
+  downloadOutline,
+  printOutline,
   personOutline,
+  shareSocialOutline,
   timeOutline,
 } from 'ionicons/icons';
 import { BusinessProfileService } from '../business-profile/business-profile.service';
 import { CustomerService } from '../customers/customer.service';
 import { Quotation, QuotationStatus } from './quotation.model';
+import { PdfTemplate, QuotationPdfService } from './quotation-pdf.service';
 import { QuotationService } from './quotation.service';
 
 @Component({
@@ -43,8 +47,11 @@ export class QuotationPreviewPage {
   private readonly service = inject(QuotationService);
   private readonly customers = inject(CustomerService);
   private readonly toasts = inject(ToastController);
+  private readonly pdf = inject(QuotationPdfService);
   readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   readonly quote = signal<Quotation | undefined>(this.service.find(this.id));
+  readonly pdfTemplate = signal<PdfTemplate>('modern');
+  readonly exporting = signal(false);
   readonly business = inject(BusinessProfileService).get();
   readonly customer = this.customers.find(this.quote()?.customerId ?? '');
   readonly statuses: QuotationStatus[] = [
@@ -61,9 +68,81 @@ export class QuotationPreviewPage {
       copyOutline,
       createOutline,
       documentTextOutline,
+      downloadOutline,
+      printOutline,
       personOutline,
+      shareSocialOutline,
       timeOutline,
     });
+  }
+  selectTemplate(template: PdfTemplate): void {
+    this.pdfTemplate.set(template);
+  }
+  async downloadPdf(): Promise<void> {
+    const quote = this.quote();
+    if (!quote || this.exporting()) return;
+    this.exporting.set(true);
+    try {
+      await this.pdf.download(
+        quote,
+        this.business,
+        this.customer,
+        this.pdfTemplate(),
+      );
+      await this.notice('PDF downloaded', 'success');
+    } catch {
+      await this.notice('Could not create PDF', 'danger');
+    } finally {
+      this.exporting.set(false);
+    }
+  }
+  async printPdf(): Promise<void> {
+    const quote = this.quote();
+    if (!quote || this.exporting()) return;
+    try {
+      await this.pdf.print(
+        quote,
+        this.business,
+        this.customer,
+        this.pdfTemplate(),
+      );
+    } catch {
+      await this.notice('Could not open print preview', 'danger');
+    }
+  }
+  async sharePdf(): Promise<void> {
+    const quote = this.quote();
+    if (!quote || this.exporting()) return;
+    this.exporting.set(true);
+    try {
+      const result = await this.pdf.share(
+        quote,
+        this.business,
+        this.customer,
+        this.pdfTemplate(),
+      );
+      await this.notice(
+        result === 'shared'
+          ? 'PDF ready to share'
+          : 'Sharing is unavailable — PDF downloaded',
+        'success',
+      );
+    } catch (error) {
+      if ((error as Error)?.name !== 'AbortError') {
+        await this.notice('Could not share PDF', 'danger');
+      }
+    } finally {
+      this.exporting.set(false);
+    }
+  }
+  private async notice(message: string, color?: string): Promise<void> {
+    const toast = await this.toasts.create({
+      message,
+      duration: 1600,
+      color,
+      position: 'bottom',
+    });
+    await toast.present();
   }
   get expired(): boolean {
     const value = this.quote();

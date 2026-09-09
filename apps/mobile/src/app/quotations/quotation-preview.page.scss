@@ -140,6 +140,59 @@ ion-content {
   background: #fff0f2;
   color: #b93947;
 }
+.pdf-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #dfe3eb;
+  border-radius: 16px;
+  background: #fff;
+}
+.template-picker,
+.pdf-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.template-picker span {
+  margin-right: 3px;
+  color: #929bad;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.pdf-tools button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid #dde3ef;
+  border-radius: 10px;
+  padding: 9px 11px;
+  background: #f8f9fc;
+  color: #68738a;
+  font-size: 8px;
+  font-weight: 700;
+}
+.template-picker button.active {
+  border-color: #3768ed;
+  background: #eaf0ff;
+  color: #315fdc;
+}
+.pdf-actions button ion-icon {
+  font-size: 14px;
+}
+.pdf-actions .share {
+  border-color: #3768ed;
+  background: #3768ed;
+  color: #fff;
+}
+.pdf-tools button:disabled {
+  opacity: 0.55;
+}
 .paper {
   padding: 34px;
   border-radius: 8px;
@@ -380,5 +433,16 @@ td small {
   .status-actions {
     margin-left: 5px;
     margin-right: 5px;
+  }
+  .pdf-tools {
+    display: block;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  .template-picker {
+    margin-bottom: 10px;
+  }
+  .pdf-actions button {
+    flex: 1;
   }
 }

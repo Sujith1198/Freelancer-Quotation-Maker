@@ -35,6 +35,34 @@
         {{ status }}</button
       >}
     </div>
+    <section class="pdf-tools">
+      <div class="template-picker">
+        <span>PDF STYLE</span>
+        <button
+          [class.active]="pdfTemplate()==='modern'"
+          (click)="selectTemplate('modern')"
+        >
+          Modern
+        </button>
+        <button
+          [class.active]="pdfTemplate()==='classic'"
+          (click)="selectTemplate('classic')"
+        >
+          Classic
+        </button>
+      </div>
+      <div class="pdf-actions">
+        <button (click)="downloadPdf()" [disabled]="exporting()">
+          <ion-icon name="download-outline" /> Download PDF
+        </button>
+        <button (click)="printPdf()" [disabled]="exporting()">
+          <ion-icon name="print-outline" /> Print
+        </button>
+        <button class="share" (click)="sharePdf()" [disabled]="exporting()">
+          <ion-icon name="share-social-outline" /> Share
+        </button>
+      </div>
+    </section>
     <article class="paper">
       <header class="paper-head">
         <div class="company">
