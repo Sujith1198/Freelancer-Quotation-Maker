@@ -29,16 +29,20 @@ $reminderPosition = array_search('reminders', $segments, true);
 $analyticsPosition = array_search('analytics', $segments, true);
 $syncPosition = array_search('sync', $segments, true);
 $billingPosition = array_search('billing', $segments, true);
+$adminPosition = array_search('admin', $segments, true);
+$adminAction = $adminPosition === false ? null : ($segments[$adminPosition + 1] ?? 'overview');
+$adminTargetId = $adminPosition === false ? null : ($segments[$adminPosition + 2] ?? null);
 if ($customerPosition !== false) $customerId = $segments[$customerPosition + 1] ?? null;
 if ($productPosition !== false) $productId = $segments[$productPosition + 1] ?? null;
 if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 1] ?? null;
 if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
 if ($invoicePosition !== false) $invoiceId = $segments[$invoicePosition + 1] ?? null;
 if ($reminderPosition !== false) $reminderId = $segments[$reminderPosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false && $syncPosition === false && $billingPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v14', 'authenticatedAccount' => $accountId]);
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false && $syncPosition === false && $billingPosition === false && $adminPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v16', 'authenticatedAccount' => $accountId]);
 
 try {
     $pdo = database();
+    if ($adminPosition !== false) handle_admin($pdo,$method,$accountId,$adminAction,$adminTargetId);
     if ($syncPosition !== false) handle_sync($pdo, $method, $accountId);
     if ($billingPosition !== false) handle_billing($pdo, $method, $accountId);
     if ($productPosition !== false) handle_catalog($pdo, $method, $productId);
@@ -98,6 +102,12 @@ function handle_auth(PDO $pdo, string $method, ?string $action): never {
         if (!preg_match('/^Bearer\s+(.+)$/i', $header, $matches)) json_response(['message'=>'Bearer token required.'],401);
         $pdo->prepare('DELETE FROM api_sessions WHERE token_hash=:token_hash')->execute(['token_hash'=>hash('sha256',trim($matches[1]))]); json_response(['message'=>'Logged out.']);
     }
+    if ($method === 'DELETE' && $action === 'account') {
+        $accountId = authorize_request();
+        if (!$accountId) json_response(['message'=>'Bearer account session required.'],401);
+        $stmt=$pdo->prepare('DELETE FROM accounts WHERE id=:id');$stmt->execute(['id'=>$accountId]);
+        json_response(['message'=>'Account and associated cloud data deleted.']);
+    }
     json_response(['message' => 'Auth route not found.'], 404);
 }
 
@@ -137,6 +147,28 @@ function handle_billing(PDO $pdo, string $method, ?string $accountId): never {
     $stmt->execute(['account_id'=>$accountId]); $subscription=$stmt->fetch();
     if(!$subscription) json_response(['data'=>['planCode'=>'free','provider'=>null,'status'=>'active','currentPeriodEnd'=>null]]);
     json_response(['data'=>['planCode'=>$subscription['plan_code'],'provider'=>$subscription['provider'],'status'=>$subscription['status'],'currentPeriodEnd'=>$subscription['current_period_end'],'updatedAt'=>$subscription['updated_at']]]);
+}
+
+function handle_admin(PDO $pdo,string $method,?string $accountId,?string $action,?string $targetId):never{
+    if(!$accountId)json_response(['message'=>'Admin Bearer session required.'],401);
+    $role=$pdo->prepare("SELECT role FROM accounts WHERE id=:id AND status='active'");$role->execute(['id'=>$accountId]);
+    if($role->fetchColumn()!=='admin')json_response(['message'=>'Administrator access required.'],403);
+    if($method==='GET'&&$action==='overview'){
+        $counts=$pdo->query("SELECT COUNT(*) total,SUM(status='active') active,SUM(status='disabled') disabled,SUM(role='admin') admins FROM accounts")->fetch();
+        $pro=(int)$pdo->query("SELECT COUNT(*) FROM subscriptions WHERE plan_code='pro' AND status IN ('active','grace_period')")->fetchColumn();
+        $settings=$pdo->query("SELECT setting_key,setting_value FROM app_settings")->fetchAll(PDO::FETCH_KEY_PAIR);
+        json_response(['data'=>['totalUsers'=>(int)$counts['total'],'activeUsers'=>(int)$counts['active'],'disabledUsers'=>(int)$counts['disabled'],'proUsers'=>$pro,'monthlyPrice'=>(float)($settings['monthly_price_inr']??199),'yearlyPrice'=>(float)($settings['yearly_price_inr']??1999)]]);
+    }
+    if($method==='GET'&&$action==='users'){
+        $q=trim((string)($_GET['q']??''));$stmt=$pdo->prepare("SELECT a.id,a.name,a.email,a.business_name,a.status,a.created_at,COALESCE(s.plan_code,'free') plan_code,s.current_period_end FROM accounts a LEFT JOIN subscriptions s ON s.account_id=a.id WHERE (:q='' OR a.name LIKE :name_q OR a.email LIKE :email_q) ORDER BY a.created_at DESC LIMIT 200");$stmt->execute(['q'=>$q,'name_q'=>"%{$q}%",'email_q'=>"%{$q}%"]);json_response(['data'=>$stmt->fetchAll()]);
+    }
+    if($method==='PATCH'&&$action==='users'&&$targetId){
+        if($targetId===$accountId)json_response(['message'=>'You cannot modify your own admin account here.'],422);$body=request_body();$status=$body['status']??'';$plan=$body['planCode']??'';
+        if(!in_array($status,['active','disabled'],true)||!in_array($plan,['free','pro'],true))json_response(['message'=>'Valid status and plan are required.'],422);
+        $pdo->beginTransaction();try{$pdo->prepare('UPDATE accounts SET status=:status WHERE id=:id')->execute(['status'=>$status,'id'=>$targetId]);$pdo->prepare("INSERT INTO subscriptions(account_id,plan_code,provider,status,current_period_end) VALUES(:id,:plan,'admin','active',IF(:plan2='pro',DATE_ADD(NOW(),INTERVAL 1 YEAR),NULL)) ON DUPLICATE KEY UPDATE plan_code=VALUES(plan_code),provider='admin',status='active',current_period_end=VALUES(current_period_end)")->execute(['id'=>$targetId,'plan'=>$plan,'plan2'=>$plan]);$pdo->commit();json_response(['message'=>'User updated.']);}catch(Throwable $e){$pdo->rollBack();throw $e;}
+    }
+    if($method==='PUT'&&$action==='pricing'){$body=request_body();$monthly=(float)($body['monthlyPrice']??-1);$yearly=(float)($body['yearlyPrice']??-1);if($monthly<0||$yearly<0)json_response(['message'=>'Prices must be zero or greater.'],422);$stmt=$pdo->prepare('INSERT INTO app_settings(setting_key,setting_value) VALUES(:key,:value) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value)');$stmt->execute(['key'=>'monthly_price_inr','value'=>(string)$monthly]);$stmt->execute(['key'=>'yearly_price_inr','value'=>(string)$yearly]);json_response(['message'=>'Pricing updated.']);}
+    json_response(['message'=>'Admin route not found.'],404);
 }
 
 function validate_customer(array $body): void {

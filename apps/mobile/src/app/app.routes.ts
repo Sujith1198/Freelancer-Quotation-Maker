@@ -1,7 +1,12 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
+import { onboardingGuard } from './onboarding/onboarding.guard';
 
 export const appRoutes: Routes = [
+  {
+    path: 'admin',
+    loadComponent: () => import('./admin/admin.page').then((m) => m.AdminPage),
+  },
   {
     path: 'login',
     loadComponent: () => import('./auth/login.page').then((m) => m.LoginPage),
@@ -13,8 +18,14 @@ export const appRoutes: Routes = [
       import('./auth/account.page').then((m) => m.AccountPage),
   },
   {
-    path: '',
+    path: 'onboarding',
     canActivate: [authGuard],
+    loadComponent: () =>
+      import('./onboarding/onboarding.page').then((m) => m.OnboardingPage),
+  },
+  {
+    path: '',
+    canActivate: [authGuard, onboardingGuard],
     loadComponent: () =>
       import('./dashboard/dashboard.page').then((m) => m.DashboardPage),
   },
@@ -131,6 +142,12 @@ export const appRoutes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./billing/upgrade.page').then((m) => m.UpgradePage),
+  },
+  {
+    path: 'settings',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./settings/settings.page').then((m) => m.SettingsPage),
   },
   { path: '**', redirectTo: '' },
 ];

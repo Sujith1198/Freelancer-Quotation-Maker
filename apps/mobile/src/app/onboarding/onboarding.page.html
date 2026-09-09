@@ -1,0 +1,24 @@
+<ion-content [fullscreen]="true"
+  ><main class="onboarding">
+    <header>
+      <span><ion-icon name="flash" /> QuoteSwift</span
+      ><button (click)="finish()">Skip</button>
+    </header>
+    <section class="visual">
+      <div class="orb"><ion-icon [name]="slides[step()].icon" /></div>
+      <span>{{ slides[step()].kicker }}</span>
+      <h1>{{ slides[step()].title }}</h1>
+      <p>{{ slides[step()].text }}</p>
+    </section>
+    <footer>
+      <div class="dots">
+        @for (slide of slides; track slide.title; let i=$index) {
+        <span [class.active]="i===step()"></span> }
+      </div>
+      <ion-button expand="block" (click)="next()"
+        >{{ step() === slides.length-1 ? 'Start using QuoteSwift' : 'Continue'
+        }}<ion-icon slot="end" name="arrow-forward" /></ion-button
+      ><small>V15 · Built for Indian freelancers and small businesses</small>
+    </footer>
+  </main></ion-content
+>

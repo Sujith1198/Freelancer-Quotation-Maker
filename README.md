@@ -1,4 +1,4 @@
-# QuoteSwift V14
+# QuoteSwift V16
 
 Mobile-first quotation maker built with Nx, Angular, Ionic, and Capacitor.
 
@@ -13,11 +13,11 @@ npm run lint
 For Android, install Android Studio and run `npm run android:add`, followed by
 `npm run android:sync` and `npm run android:open`.
 
-V14 includes everything in V1–V13 plus Free and Pro plans, usage visibility,
-feature comparison, a one-time seven-day demo entitlement, expiry handling, and
-a subscription-ready MySQL schema/status API. The demo never charges users;
-production purchases must be connected to verified Google Play Billing.
-Import backend migrations through `009` in order.
+V16 includes everything in V1–V15 plus a separate responsive Admin Console,
+secure role enforcement, platform overview metrics, all-user search, user
+block/unblock, Free/Pro assignment, pricing control and protected admin APIs.
+Import backend migrations through `010` and promote the verified owner account
+using the documented SQL comment.
 
 ## Nx workspace
 

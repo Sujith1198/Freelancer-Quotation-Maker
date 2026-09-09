@@ -1,0 +1,177 @@
+:host {
+  display: block;
+  --ink: #15213b;
+  --muted: #75809a;
+}
+ion-content {
+  --background: #f5f7fb;
+}
+.settings-shell {
+  max-width: 680px;
+  margin: auto;
+  padding: calc(18px + var(--ion-safe-area-top)) 20px 55px;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 20px -11px;
+}
+header ion-button {
+  --color: var(--ink);
+}
+header span {
+  color: #3768ed;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+  font-weight: 900;
+}
+h1 {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: 23px;
+}
+.privacy {
+  display: flex;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 19px;
+  color: #fff;
+  background: linear-gradient(130deg, #2454ce, #4e7df3);
+  box-shadow: 0 14px 30px rgba(42, 82, 190, 0.2);
+}
+.privacy > ion-icon {
+  flex: 0 0 auto;
+  font-size: 31px;
+}
+.privacy h2,
+.privacy p {
+  margin: 0;
+}
+.privacy h2 {
+  font-size: 14px;
+}
+.privacy p {
+  margin-top: 4px;
+  font-size: 9px;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+h3 {
+  margin: 23px 4px 9px;
+  color: #8a95aa;
+  font-size: 9px;
+  letter-spacing: 1.3px;
+}
+.list,
+.danger {
+  overflow: hidden;
+  border: 1px solid #e4e8f0;
+  border-radius: 18px;
+  background: #fff;
+}
+.list button,
+.list label,
+.list a,
+.list .static {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 0;
+  border-bottom: 1px solid #eef1f5;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  background: #fff;
+  font: inherit;
+}
+.list > :last-child {
+  border-bottom: 0;
+}
+.list > * > span {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #3768ed;
+  background: #edf2ff;
+  font-size: 19px;
+}
+.list strong,
+.list small {
+  display: block;
+}
+.list strong {
+  font-size: 11px;
+}
+.list small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 8px;
+}
+.list label {
+  position: relative;
+  cursor: pointer;
+}
+.list input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.danger button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 0;
+  border-bottom: 1px solid #f7e7e7;
+  color: #c23f3f;
+  text-align: left;
+  background: #fff;
+  font: inherit;
+}
+.danger button:last-child {
+  border-bottom: 0;
+}
+.danger ion-icon {
+  font-size: 20px;
+}
+.danger strong,
+.danger small {
+  display: block;
+}
+.danger strong {
+  font-size: 10px;
+}
+.danger small {
+  margin-top: 3px;
+  color: #a98484;
+  font-size: 8px;
+}
+.message {
+  padding: 11px;
+  margin: 13px 0;
+  border-radius: 11px;
+  color: #26734f;
+  text-align: center;
+  background: #e9f8f0;
+  font-size: 10px;
+  font-weight: 700;
+}
+.message.error {
+  color: #b53b3b;
+  background: #fff0f0;
+}
+.note {
+  margin: 17px 10px;
+  color: #98a2b5;
+  text-align: center;
+  font-size: 8px;
+  line-height: 1.5;
+}

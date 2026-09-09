@@ -1,0 +1,87 @@
+<ion-content [fullscreen]="true"
+  ><main class="settings-shell">
+    <header>
+      <ion-button fill="clear" routerLink="/" aria-label="Back"
+        ><ion-icon slot="icon-only" name="arrow-back"
+      /></ion-button>
+      <div>
+        <span>V15 CONTROL CENTER</span>
+        <h1>Settings & privacy</h1>
+      </div>
+    </header>
+    <section class="privacy">
+      <ion-icon name="shield-checkmark-outline" />
+      <div>
+        <h2>Privacy by design</h2>
+        <p>
+          Your offline records stay on this device unless you explicitly push a
+          cloud backup.
+        </p>
+      </div>
+    </section>
+    <h3>DATA & BACKUP</h3>
+    <section class="list">
+      <button (click)="export()">
+        <span><ion-icon name="download-outline" /></span>
+        <div>
+          <strong>Export local backup</strong
+          ><small>Download a portable JSON copy</small>
+        </div></button
+      ><label
+        ><span><ion-icon name="cloud-upload-outline" /></span>
+        <div>
+          <strong>Import backup</strong
+          ><small>Restore a QuoteSwift JSON file</small>
+        </div>
+        <input
+          type="file"
+          accept="application/json,.json"
+          (change)="import($event)" /></label
+      ><a routerLink="/cloud-sync"
+        ><span><ion-icon name="refresh-outline" /></span>
+        <div>
+          <strong>Cloud backup & sync</strong
+          ><small>Connect, push or restore</small>
+        </div></a
+      >
+    </section>
+    <h3>APP & SUPPORT</h3>
+    <section class="list">
+      <button (click)="restartOnboarding()">
+        <span><ion-icon name="information-circle-outline" /></span>
+        <div>
+          <strong>View welcome guide</strong
+          ><small>Replay first-run onboarding</small>
+        </div>
+      </button>
+      <div class="static">
+        <span><ion-icon name="lock-closed-outline" /></span>
+        <div>
+          <strong>QuoteSwift V15</strong
+          ><small>Nx · Angular · Ionic · Capacitor</small>
+        </div>
+      </div>
+    </section>
+    <h3>DANGER ZONE</h3>
+    <section class="danger">
+      <button (click)="clearBusiness()">
+        <ion-icon name="trash-outline" /><span
+          ><strong>Clear business data</strong
+          ><small>Keep account and preferences</small></span
+        ></button
+      ><button (click)="deleteAccount()">
+        <ion-icon name="trash-outline" /><span
+          ><strong>Delete local account & data</strong
+          ><small>Remove everything from this device</small></span
+        >
+      </button>
+    </section>
+    @if(message()){
+    <p class="message" [class.error]="error()">{{message()}}</p>
+    }
+    <p class="note">
+      Cloud account deletion requires a server request after the public API is
+      deployed. Local deletion is immediate.
+    </p>
+  </main></ion-content
+>

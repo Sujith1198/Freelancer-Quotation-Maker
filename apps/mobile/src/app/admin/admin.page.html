@@ -1,0 +1,119 @@
+<ion-content [fullscreen]="true"
+  ><main class="admin-shell">
+    @if(!admin.session()){
+    <section class="login">
+      <div class="logo"><ion-icon name="shield-checkmark-outline" /></div>
+      <span>QUOTESWIFT V16</span>
+      <h1>Admin Control</h1>
+      <p>Authorized administrators only</p>
+      <label for="admin-url">API URL</label
+      ><ion-input
+        id="admin-url"
+        [(ngModel)]="apiUrl"
+        placeholder="https://example.com/api"
+      /><label for="admin-email">Admin email</label
+      ><ion-input id="admin-email" [(ngModel)]="email" type="email" /><label
+        for="admin-password"
+        >Password</label
+      ><ion-input
+        id="admin-password"
+        [(ngModel)]="password"
+        type="password"
+      /><ion-button expand="block" (click)="login()" [disabled]="admin.busy()"
+        >@if(admin.busy()){<ion-spinner />}@else{Secure admin login}</ion-button
+      >@if(admin.error()){
+      <p class="error">{{admin.error()}}</p>
+      }
+    </section>
+    }@else{
+    <header>
+      <div>
+        <span>ADMIN CONSOLE</span>
+        <h1>QuoteSwift Control</h1>
+      </div>
+      <button (click)="admin.logout()">
+        <ion-icon name="log-out-outline" /> Logout
+      </button>
+    </header>
+    @if(admin.overview();as o){
+    <section class="stats">
+      <article>
+        <ion-icon name="people-outline" /><strong>{{o.totalUsers}}</strong
+        ><small>Total users</small>
+      </article>
+      <article>
+        <ion-icon name="checkmark-circle-outline" /><strong
+          >{{o.activeUsers}}</strong
+        ><small>Active</small>
+      </article>
+      <article>
+        <ion-icon name="card-outline" /><strong>{{o.proUsers}}</strong
+        ><small>Pro users</small>
+      </article>
+      <article>
+        <ion-icon name="ban-outline" /><strong>{{o.disabledUsers}}</strong
+        ><small>Blocked</small>
+      </article>
+    </section>
+    }
+    <section class="pricing">
+      <div>
+        <h2>Price control</h2>
+        <p>Update app subscription display pricing</p>
+      </div>
+      <label
+        >Monthly ₹<input type="number" [(ngModel)]="monthly" min="0" /></label
+      ><label
+        >Yearly ₹<input type="number" [(ngModel)]="yearly" min="0" /></label
+      ><button (click)="savePrice()">Save prices</button>
+    </section>
+    <section class="users">
+      <div class="title">
+        <div>
+          <h2>All users</h2>
+          <p>Search, block and manage plans</p>
+        </div>
+        <div class="search">
+          <ion-icon name="search-outline" /><input
+            [(ngModel)]="query"
+            (keyup.enter)="refresh()"
+            placeholder="Search name or email"
+          />
+        </div>
+      </div>
+      <div class="table">
+        @for(user of admin.users();track user.id){
+        <article>
+          <div class="avatar">{{user.name.charAt(0)}}</div>
+          <div class="identity">
+            <strong>{{user.name}}</strong><span>{{user.email}}</span
+            ><small>{{user.business_name||'No business name'}}</small>
+          </div>
+          <div class="badges">
+            <span [class.pro]="user.plan_code==='pro'">{{user.plan_code}}</span
+            ><span [class.blocked]="user.status==='disabled'"
+              >{{user.status}}</span
+            >
+          </div>
+          <div class="actions">
+            <button
+              (click)="update(user,user.status,user.plan_code==='pro'?'free':'pro')"
+            >
+              Make {{user.plan_code==='pro'?'Free':'Pro'}}</button
+            ><button
+              (click)="update(user,user.status==='active'?'disabled':'active',user.plan_code)"
+            >
+              {{user.status==='active'?'Block':'Unblock'}}
+            </button>
+          </div>
+        </article>
+        }@empty{
+        <p class="empty">No users found.</p>
+        }
+      </div>
+    </section>
+    @if(admin.error()){
+    <p class="error">{{admin.error()}}</p>
+    }}
+  </main></ion-content
+>

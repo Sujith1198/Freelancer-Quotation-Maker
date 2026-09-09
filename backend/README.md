@@ -29,3 +29,11 @@ and each snapshot is limited to 5 MB.
 V14 adds authenticated `GET /billing` subscription status and the subscription
 schema required for a future verified Google Play webhook. Client requests
 cannot directly grant themselves Pro access.
+
+V15 adds authenticated `DELETE /auth/account`. It removes the account and
+cascades its sessions, cloud snapshot and subscription data.
+
+V16 adds `/admin/overview`, `/admin/users`, `/admin/users/{id}` and
+`/admin/pricing`. Run migration `010`, then promote only the verified owner
+account to the `admin` role as shown in that migration. Every admin API checks
+the Bearer account role server-side.

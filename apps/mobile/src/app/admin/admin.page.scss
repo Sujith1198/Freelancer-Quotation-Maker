@@ -1,0 +1,266 @@
+:host {
+  display: block;
+  --ink: #14203a;
+}
+ion-content {
+  --background: #f3f6fb;
+}
+.admin-shell {
+  max-width: 1100px;
+  margin: auto;
+  padding: calc(24px + var(--ion-safe-area-top)) 22px 60px;
+}
+.login {
+  max-width: 430px;
+  margin: 7vh auto;
+  padding: 28px;
+  border: 1px solid #e1e7f0;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(34, 52, 90, 0.12);
+}
+.logo {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  color: #fff;
+  font-size: 29px;
+  background: #274fc5;
+}
+.login > span,
+header span {
+  color: #3768ed;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  font-weight: 900;
+}
+.login h1 {
+  margin: 10px 0 3px;
+}
+.login p {
+  color: #8190a8;
+  font-size: 10px;
+}
+.login label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.login ion-input {
+  --padding-start: 12px;
+  border: 1px solid #dfe5ef;
+  border-radius: 12px;
+}
+.login ion-button {
+  margin-top: 20px;
+  --border-radius: 12px;
+  text-transform: none;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header h1 {
+  margin: 2px 0;
+  font-size: 24px;
+}
+header button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px;
+  color: #56637b;
+  background: #fff;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 22px 0;
+}
+.stats article,
+.pricing,
+.users {
+  border: 1px solid #e2e7ef;
+  border-radius: 18px;
+  background: #fff;
+}
+.stats article {
+  padding: 18px;
+}
+.stats ion-icon {
+  color: #3768ed;
+  font-size: 21px;
+}
+.stats strong,
+.stats small {
+  display: block;
+}
+.stats strong {
+  margin-top: 8px;
+  font-size: 23px;
+}
+.stats small {
+  color: #8390a5;
+  font-size: 9px;
+}
+.pricing {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+  padding: 18px;
+}
+.pricing > div {
+  margin-right: auto;
+}
+.pricing h2,
+.users h2 {
+  margin: 0;
+  font-size: 15px;
+}
+.pricing p,
+.users p {
+  margin: 3px 0;
+  color: #8995a8;
+  font-size: 9px;
+}
+.pricing label {
+  font-size: 9px;
+  font-weight: 800;
+}
+.pricing input,
+.search input {
+  display: block;
+  margin-top: 5px;
+  padding: 9px;
+  border: 1px solid #dfe4ed;
+  border-radius: 9px;
+  width: 110px;
+}
+.pricing button,
+.actions button {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px;
+  color: #fff;
+  background: #3768ed;
+  font-size: 9px;
+  font-weight: 800;
+}
+.users {
+  margin-top: 15px;
+  overflow: hidden;
+}
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.search input {
+  width: 210px;
+  margin: 0;
+}
+.table article {
+  display: grid;
+  grid-template-columns: 42px minmax(170px, 1fr) 150px 190px;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-top: 1px solid #eef1f5;
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #fff;
+  background: #557bea;
+  font-weight: 900;
+}
+.identity strong,
+.identity span,
+.identity small {
+  display: block;
+}
+.identity strong {
+  font-size: 11px;
+}
+.identity span,
+.identity small {
+  color: #7d899d;
+  font-size: 8px;
+}
+.badges span {
+  display: inline-block;
+  margin: 2px;
+  padding: 5px 7px;
+  border-radius: 7px;
+  background: #edf0f5;
+  font-size: 8px;
+  text-transform: uppercase;
+}
+.badges .pro {
+  color: #5930c0;
+  background: #eee8ff;
+}
+.badges .blocked {
+  color: #ad3939;
+  background: #ffeaea;
+}
+.actions {
+  display: flex;
+  gap: 6px;
+}
+.actions button:last-child {
+  color: #a33c3c;
+  background: #fff0f0;
+}
+.error {
+  color: #bd3d3d;
+  text-align: center;
+  font-size: 10px;
+}
+.empty {
+  padding: 28px !important;
+  text-align: center;
+}
+@media (max-width: 720px) {
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pricing {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .pricing > div {
+    margin: 0;
+  }
+  .title {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .search input {
+    width: 100%;
+  }
+  .table article {
+    grid-template-columns: 42px 1fr;
+  }
+  .badges,
+  .actions {
+    grid-column: 2;
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+}
