@@ -1,0 +1,159 @@
+<ion-content [fullscreen]="true">
+  <main class="page">
+    <header class="header">
+      <a class="back" routerLink="/"><ion-icon name="arrow-back" /></a>
+      <div>
+        <p>BUSINESS REPORT</p>
+        <h1>Analytics</h1>
+      </div>
+      <button class="export" (click)="export()">
+        <ion-icon name="download-outline" /> CSV
+      </button>
+    </header>
+    <nav class="ranges">
+      @for(option of ranges;track option.value){<button
+        [class.active]="range()===option.value"
+        (click)="selectRange(option.value)"
+      >
+        {{ option.label }}</button
+      >}
+    </nav>
+    <section class="hero">
+      <div>
+        <small>PAYMENTS COLLECTED</small>
+        <h2>{{ report().collectedValue|currency:'INR':'symbol':'1.0-0' }}</h2>
+        <p>
+          From {{ report().invoicedValue|currency:'INR':'symbol':'1.0-0' }}
+          invoiced
+        </p>
+      </div>
+      <span class="conversion"
+        ><strong>{{ report().conversionRate }}%</strong
+        ><small>quote conversion</small></span
+      >
+    </section>
+    <section class="metric-grid">
+      <article>
+        <span class="icon blue"><ion-icon name="bar-chart-outline" /></span>
+        <div>
+          <small>Quotation value</small
+          ><strong
+            >{{ report().quotationValue|currency:'INR':'symbol':'1.0-0'
+            }}</strong
+          >
+        </div>
+      </article>
+      <article>
+        <span class="icon purple"><ion-icon name="receipt-outline" /></span>
+        <div>
+          <small>Invoiced</small
+          ><strong
+            >{{ report().invoicedValue|currency:'INR':'symbol':'1.0-0'
+            }}</strong
+          >
+        </div>
+      </article>
+      <article>
+        <span class="icon green"><ion-icon name="cash-outline" /></span>
+        <div>
+          <small>Collected</small
+          ><strong
+            >{{ report().collectedValue|currency:'INR':'symbol':'1.0-0'
+            }}</strong
+          >
+        </div>
+      </article>
+      <article>
+        <span class="icon orange"><ion-icon name="wallet-outline" /></span>
+        <div>
+          <small>Outstanding</small
+          ><strong
+            >{{ report().outstandingValue|currency:'INR':'symbol':'1.0-0'
+            }}</strong
+          >
+        </div>
+      </article>
+    </section>
+    <section class="panel chart-panel">
+      <header>
+        <div>
+          <small>LAST 6 MONTHS</small>
+          <h2>Invoice performance</h2>
+        </div>
+        <span><i></i>Invoiced <i></i>Collected</span>
+      </header>
+      <div class="chart">
+        @for(month of report().monthly;track month.label){
+        <div class="month">
+          <div class="bars">
+            <span
+              class="invoiced"
+              [style.height.%]="monthHeight(month.invoiced)"
+            ></span
+            ><span
+              class="collected"
+              [style.height.%]="monthHeight(month.collected)"
+            ></span>
+          </div>
+          <small>{{ month.label }}</small>
+        </div>
+        }
+      </div>
+    </section>
+    <div class="lower-grid">
+      <section class="panel statuses">
+        <header>
+          <div>
+            <small>PIPELINE</small>
+            <h2>Quote statuses</h2>
+          </div>
+          <ion-icon name="stats-chart-outline" />
+        </header>
+        @for(status of ['Draft','Sent','Accepted','Rejected'];track status){
+        <div class="status-row">
+          <span>{{status}}</span>
+          <div>
+            <i
+              [class]="status.toLowerCase()"
+              [style.width.%]="statusPercent($any(report().quoteStatuses)[status])"
+            ></i>
+          </div>
+          <strong>{{ $any(report().quoteStatuses)[status] }}</strong>
+        </div>
+        }
+      </section>
+      <section class="panel customers">
+        <header>
+          <div>
+            <small>REVENUE</small>
+            <h2>Top customers</h2>
+          </div>
+          <ion-icon name="people-outline" />
+        </header>
+        @if(report().topCustomers.length){@for(customer of
+        report().topCustomers;track customer.customerId;let i=$index){
+        <article>
+          <span>{{i+1}}</span>
+          <div>
+            <strong>{{customer.name}}</strong
+            ><small
+              >{{customer.invoices}}
+              invoice{{customer.invoices===1?'':'s'}}</small
+            >
+          </div>
+          <p>
+            <strong
+              >{{customer.invoiced|currency:'INR':'symbol':'1.0-0'}}</strong
+            ><small
+              >{{customer.collected|currency:'INR':'symbol':'1.0-0'}}
+              paid</small
+            >
+          </p>
+        </article>
+        }}@else{
+        <p class="empty">Invoice data will appear here.</p>
+        }
+      </section>
+    </div>
+  </main>
+</ion-content>

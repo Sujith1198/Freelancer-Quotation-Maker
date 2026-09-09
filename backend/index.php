@@ -18,13 +18,14 @@ $quotationPosition = array_search('quotations', $segments, true);
 $paymentPosition = array_search('payments', $segments, true);
 $invoicePosition = array_search('invoices', $segments, true);
 $reminderPosition = array_search('reminders', $segments, true);
+$analyticsPosition = array_search('analytics', $segments, true);
 if ($customerPosition !== false) $customerId = $segments[$customerPosition + 1] ?? null;
 if ($productPosition !== false) $productId = $segments[$productPosition + 1] ?? null;
 if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 1] ?? null;
 if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
 if ($invoicePosition !== false) $invoiceId = $segments[$invoicePosition + 1] ?? null;
 if ($reminderPosition !== false) $reminderId = $segments[$reminderPosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v10']);
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v11']);
 
 try {
     $pdo = database();
@@ -32,6 +33,7 @@ try {
     if ($paymentPosition !== false) handle_payments($pdo, $method, $paymentQuotationId);
     if ($invoicePosition !== false) handle_invoices($pdo, $method, $invoiceId);
     if ($reminderPosition !== false) handle_reminders($pdo, $method, $reminderId);
+    if ($analyticsPosition !== false) handle_analytics($pdo, $method);
     if ($quotationPosition !== false) handle_quotations($pdo, $method, $quotationId);
     if ($method === 'GET' && !$customerId) {
         $query = trim($_GET['q'] ?? '');
@@ -232,4 +234,18 @@ function handle_reminders(PDO $pdo, string $method, ?string $reminderId): never 
     }
     if ($method==='DELETE'&&$reminderId) {$stmt=$pdo->prepare('DELETE FROM follow_up_reminders WHERE id=:id');$stmt->execute(['id'=>$reminderId]);json_response(['message'=>'Reminder deleted.']);}
     json_response(['message'=>'Reminder route not found.'],404);
+}
+
+function handle_analytics(PDO $pdo, string $method): never {
+    if ($method !== 'GET') json_response(['message'=>'Method not allowed.'],405);
+    $days=(int)($_GET['days']??365);$allowed=[0,30,90,365];if(!in_array($days,$allowed,true))$days=365;
+    $quoteWhere=$days>0?' WHERE created_at >= DATE_SUB(NOW(), INTERVAL :days DAY)':'';
+    $invoiceWhere=$days>0?' WHERE i.created_at >= DATE_SUB(NOW(), INTERVAL :days DAY)':'';
+    $params=$days>0?['days'=>$days]:[];
+    $quotes=$pdo->prepare("SELECT COUNT(*) total_count,COALESCE(SUM(grand_total),0) quotation_value,SUM(status='Draft') draft_count,SUM(status='Sent') sent_count,SUM(status='Accepted') accepted_count,SUM(status='Rejected') rejected_count FROM quotations{$quoteWhere}");$quotes->execute($params);$quote=$quotes->fetch();
+    $invoices=$pdo->prepare("SELECT COUNT(*) invoice_count,COALESCE(SUM(i.grand_total),0) invoiced_value,COALESCE(SUM(p.amount_paid),0) collected_value FROM invoices i LEFT JOIN quotation_payments p ON p.quotation_id=i.quotation_id{$invoiceWhere}");$invoices->execute($params);$invoice=$invoices->fetch();
+    $monthly=$pdo->query("SELECT DATE_FORMAT(i.issue_date,'%Y-%m') month,COALESCE(SUM(i.grand_total),0) invoiced,COALESCE(SUM(p.amount_paid),0) collected FROM invoices i LEFT JOIN quotation_payments p ON p.quotation_id=i.quotation_id WHERE i.issue_date>=DATE_SUB(CURDATE(),INTERVAL 5 MONTH) GROUP BY DATE_FORMAT(i.issue_date,'%Y-%m') ORDER BY month")->fetchAll();
+    $customers=$pdo->prepare("SELECT i.customer_id,i.customer_name,COUNT(*) invoices,COALESCE(SUM(i.grand_total),0) invoiced,COALESCE(SUM(p.amount_paid),0) collected FROM invoices i LEFT JOIN quotation_payments p ON p.quotation_id=i.quotation_id{$invoiceWhere} GROUP BY i.customer_id,i.customer_name ORDER BY invoiced DESC LIMIT 5");$customers->execute($params);
+    $total=(int)$quote['total_count'];$accepted=(int)$quote['accepted_count'];$invoiced=(float)$invoice['invoiced_value'];$collected=(float)$invoice['collected_value'];
+    json_response(['data'=>['quotationValue'=>(float)$quote['quotation_value'],'invoicedValue'=>$invoiced,'collectedValue'=>$collected,'outstandingValue'=>max($invoiced-$collected,0),'conversionRate'=>$total>0?round($accepted/$total*100):0,'averageInvoice'=>(int)$invoice['invoice_count']>0?$invoiced/(int)$invoice['invoice_count']:0,'quoteStatuses'=>['Draft'=>(int)$quote['draft_count'],'Sent'=>(int)$quote['sent_count'],'Accepted'=>$accepted,'Rejected'=>(int)$quote['rejected_count']],'monthly'=>$monthly,'topCustomers'=>$customers->fetchAll()]]);
 }

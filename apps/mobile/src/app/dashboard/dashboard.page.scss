@@ -240,7 +240,8 @@ button {
 }
 .quick-card.catalogue,
 .quick-card.invoice,
-.quick-card.reminder {
+.quick-card.reminder,
+.quick-card.analytics {
   grid-column: 1 / -1;
 }
 .quick-icon {

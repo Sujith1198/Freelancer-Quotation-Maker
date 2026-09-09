@@ -88,5 +88,10 @@ export const appRoutes: Routes = [
         (m) => m.ReminderCenterPage,
       ),
   },
+  {
+    path: 'analytics',
+    loadComponent: () =>
+      import('./analytics/analytics.page').then((m) => m.AnalyticsPage),
+  },
   { path: '**', redirectTo: '' },
 ];
