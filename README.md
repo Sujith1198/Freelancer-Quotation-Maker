@@ -13,11 +13,10 @@ npm run lint
 For Android, install Android Studio and run `npm run android:add`, followed by
 `npm run android:sync` and `npm run android:open`.
 
-V4 includes everything in V1–V3 plus product and service catalogue management:
-item types, codes, descriptions, units, rates, GST, HSN/SAC, active status,
-search and type filters, add/edit/delete flows, offline persistence, dashboard
-navigation, PHP PDO catalogue endpoints, and a second MySQL migration. Real
-database credentials remain excluded; create `backend/.env` only on the server.
+V6 includes everything in V1–V5 plus a professional quotation preview, business
+and customer identity, item/tax/total presentation, Draft/Sent/Accepted/Rejected
+status controls, expiry indicator, duplicate-to-new-draft, preview/edit routes,
+live dashboard metrics, recent saved quotations, and a backend status endpoint.
 
 ## Nx workspace
 

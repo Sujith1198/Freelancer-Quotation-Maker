@@ -10,6 +10,8 @@ import {
 import { addIcons } from 'ionicons';
 import { BusinessProfile } from '../business-profile/business-profile.model';
 import { BusinessProfileService } from '../business-profile/business-profile.service';
+import { Quotation } from '../quotations/quotation.model';
+import { QuotationService } from '../quotations/quotation.service';
 import {
   add,
   barChartOutline,
@@ -23,15 +25,6 @@ import {
   settingsOutline,
   timeOutline,
 } from 'ionicons/icons';
-
-type QuoteStatus = 'Accepted' | 'Sent' | 'Draft';
-interface RecentQuote {
-  id: string;
-  customer: string;
-  createdAt: Date;
-  amount: number;
-  status: QuoteStatus;
-}
 
 @Component({
   selector: 'qs-dashboard-page',
@@ -50,30 +43,28 @@ interface RecentQuote {
 })
 export class DashboardPage implements OnInit {
   private readonly profiles = inject(BusinessProfileService);
+  private readonly quotationService = inject(QuotationService);
   readonly businessProfile = signal<BusinessProfile | null>(null);
-  readonly quotes: RecentQuote[] = [
-    {
-      id: 'QT-2026-014',
-      customer: 'Arun Digital Studio',
-      createdAt: new Date('2026-09-09'),
-      amount: 24500,
-      status: 'Accepted',
-    },
-    {
-      id: 'QT-2026-013',
-      customer: 'Meera Boutique',
-      createdAt: new Date('2026-09-08'),
-      amount: 12800,
-      status: 'Sent',
-    },
-    {
-      id: 'QT-2026-012',
-      customer: 'RK Electricals',
-      createdAt: new Date('2026-09-07'),
-      amount: 8650,
-      status: 'Draft',
-    },
-  ];
+  readonly quotes = signal<Quotation[]>([]);
+  get totalValue(): number {
+    return this.quotationService
+      .list()
+      .reduce((sum, quote) => sum + quote.grandTotal, 0);
+  }
+  get totalQuotes(): number {
+    return this.quotationService.list().length;
+  }
+  get acceptedQuotes(): number {
+    return this.quotationService
+      .list()
+      .filter((quote) => quote.status === 'Accepted').length;
+  }
+  get pendingQuotes(): number {
+    return this.quotationService
+      .list()
+      .filter((quote) => quote.status === 'Draft' || quote.status === 'Sent')
+      .length;
+  }
 
   constructor() {
     addIcons({
@@ -94,5 +85,6 @@ export class DashboardPage implements OnInit {
   ngOnInit(): void {
     const profile = this.profiles.get();
     this.businessProfile.set(profile.businessName ? profile : null);
+    this.quotes.set(this.quotationService.list().slice(0, 3));
   }
 }

@@ -1,0 +1,86 @@
+<ion-content [fullscreen]="true"
+  ><main class="page">
+    <header class="header">
+      <a class="back ion-activatable" routerLink="/"
+        ><ion-icon name="arrow-back" /><ion-ripple-effect
+      /></a>
+      <div>
+        <p>DOCUMENTS</p>
+        <h1>Quotations</h1>
+      </div>
+      <a class="add ion-activatable" routerLink="/quotations/new"
+        ><ion-icon name="add" /><ion-ripple-effect
+      /></a>
+    </header>
+    <section class="summary">
+      <span><ion-icon name="document-text-outline" /></span>
+      <div>
+        <strong>{{ quotes().length }}</strong><small>Total quotations</small>
+      </div>
+      <div class="value">
+        <strong>{{ totalValue()|currency:'INR':'symbol':'1.0-0' }}</strong
+        ><small>Combined value</small>
+      </div>
+    </section>
+    <label class="search"
+      ><ion-icon name="search-outline" /><input
+        type="search"
+        placeholder="Search number or customer"
+        [value]="query()"
+        (input)="updateSearch($event)"
+    /></label>
+    <div class="filters">
+      <button [class.active]="filter()==='all'" (click)="setFilter('all')">
+        All</button
+      ><button [class.active]="filter()==='Draft'" (click)="setFilter('Draft')">
+        Draft</button
+      ><button [class.active]="filter()==='Sent'" (click)="setFilter('Sent')">
+        Sent</button
+      ><button
+        [class.active]="filter()==='Accepted'"
+        (click)="setFilter('Accepted')"
+      >
+        Accepted
+      </button>
+    </div>
+    @if(filtered().length){
+    <div class="quote-list">
+      @for(quote of filtered();track quote.id){<a
+        class="quote-row"
+        [routerLink]="['/quotations', quote.id]"
+        ><div class="doc"><ion-icon name="document-text-outline" /></div>
+        <div class="info">
+          <strong>{{ quote.customerName }}</strong
+          ><span>{{ quote.number }} · {{ quote.issueDate|date:'d MMM y' }}</span
+          ><small
+            >{{ quote.items.length }} item{{ quote.items.length===1?'':'s'
+            }}</small
+          >
+        </div>
+        <div class="amount">
+          <strong>{{ quote.grandTotal|currency:'INR':'symbol':'1.0-0' }}</strong
+          ><span [class]="quote.status.toLowerCase()">{{ quote.status }}</span>
+        </div>
+        <button class="delete" (click)="confirmDelete(quote,$event)">
+          <ion-icon name="trash-outline" /></button
+        ><ion-icon class="chevron" name="chevron-forward" /></a
+      >}
+    </div>
+    }@else{
+    <section class="empty">
+      <div><ion-icon name="document-text-outline" /></div>
+      <h2>
+        {{ query()||filter()!=='all'?'No matching quotations':'Create your first
+        quotation' }}
+      </h2>
+      <p>
+        Select a customer, add items and calculate the final amount
+        automatically.
+      </p>
+      @if(!query()&&filter()==='all'){<a routerLink="/quotations/new"
+        ><ion-icon name="add" /> New quotation</a
+      >}
+    </section>
+    }
+  </main></ion-content
+>

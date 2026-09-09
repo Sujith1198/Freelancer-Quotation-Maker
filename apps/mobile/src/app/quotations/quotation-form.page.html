@@ -1,0 +1,225 @@
+<ion-content [fullscreen]="true"
+  ><main class="page">
+    <header class="header">
+      <a class="back ion-activatable" routerLink="/quotations"
+        ><ion-icon name="arrow-back" /><ion-ripple-effect
+      /></a>
+      <div>
+        <p>QUOTATION</p>
+        <h1>{{ quoteId?'Edit quotation':'New quotation' }}</h1>
+      </div>
+    </header>
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="person-outline" /></span>
+          <div>
+            <h2>Customer & validity</h2>
+            <p>Who is this quotation for?</p>
+          </div>
+        </div>
+        @if(customers.length){
+        <div class="field">
+          <label for="customerId">Customer <b>*</b></label
+          ><select id="customerId" formControlName="customerId">
+            <option value="" disabled>Select customer</option>
+            @for(customer of customers;track customer.id){
+            <option [value]="customer.id">
+              {{ customer.name }}{{ customer.businessName?' —
+              '+customer.businessName:'' }}
+            </option>
+            }
+          </select>
+        </div>
+        }@else{<a class="missing" routerLink="/customers/new"
+          >Add a customer before creating a quotation</a
+        >}
+        <div class="two">
+          <div class="field">
+            <label for="issueDate">Issue date</label
+            ><input id="issueDate" type="date" formControlName="issueDate" />
+          </div>
+          <div class="field">
+            <label for="validUntil">Valid until</label
+            ><input id="validUntil" type="date" formControlName="validUntil" />
+          </div>
+        </div>
+      </section>
+      <section class="items-card">
+        <div class="card-title">
+          <span><ion-icon name="pricetag-outline" /></span>
+          <div>
+            <h2>Items</h2>
+            <p>Add products or services</p>
+          </div>
+        </div>
+        <div formArrayName="items">
+          @for(group of items.controls;track group;let i=$index){
+          <article class="line" [formGroupName]="i">
+            <div class="line-head">
+              <strong>Item {{ i+1 }}</strong>@if(items.length>1){<button
+                type="button"
+                (click)="removeLine(i)"
+              >
+                <ion-icon name="trash-outline" /></button
+              >}
+            </div>
+            @if(catalog.length){
+            <div class="field">
+              <label [for]="'catalogItemId-' + i">Choose from catalogue</label
+              ><select
+                [id]="'catalogItemId-' + i"
+                formControlName="catalogItemId"
+                (change)="selectCatalog(i)"
+              >
+                <option value="">Custom item</option>
+                @for(item of catalog;track item.id){
+                <option [value]="item.id">
+                  {{ item.name }} — ₹{{ item.rate }}
+                </option>
+                }
+              </select>
+            </div>
+            }
+            <div class="field">
+              <label [for]="'itemName-' + i">Item name <b>*</b></label
+              ><input
+                [id]="'itemName-' + i"
+                formControlName="name"
+                placeholder="Product or service name"
+              />
+            </div>
+            <div class="field">
+              <label [for]="'description-' + i">Description</label
+              ><input
+                [id]="'description-' + i"
+                formControlName="description"
+                placeholder="Optional line description"
+              />
+            </div>
+            <div class="line-grid">
+              <div class="field">
+                <label [for]="'quantity-' + i">Qty</label
+                ><input
+                  [id]="'quantity-' + i"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  formControlName="quantity"
+                />
+              </div>
+              <div class="field">
+                <label [for]="'unit-' + i">Unit</label
+                ><input [id]="'unit-' + i" formControlName="unit" />
+              </div>
+              <div class="field">
+                <label [for]="'rate-' + i">Rate</label
+                ><input
+                  [id]="'rate-' + i"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  formControlName="rate"
+                />
+              </div>
+              <div class="field">
+                <label [for]="'taxRate-' + i">GST %</label
+                ><input
+                  [id]="'taxRate-' + i"
+                  type="number"
+                  min="0"
+                  max="100"
+                  formControlName="taxRate"
+                />
+              </div>
+            </div>
+            <div class="line-total">
+              <span>Line amount</span
+              ><strong
+                >{{ lineAmount(i)|currency:'INR':'symbol':'1.0-2' }}</strong
+              >
+            </div>
+          </article>
+          }
+        </div>
+        <button type="button" class="add-line" (click)="addLine()">
+          <ion-icon name="add" /> Add another item
+        </button>
+      </section>
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="calculator-outline" /></span>
+          <div>
+            <h2>Discount & totals</h2>
+            <p>Calculated automatically</p>
+          </div>
+        </div>
+        <div class="field discount">
+          <label for="discountRate">Discount percentage</label>
+          <div class="suffix">
+            <input
+              id="discountRate"
+              type="number"
+              min="0"
+              max="100"
+              formControlName="discountRate"
+            /><span>%</span>
+          </div>
+        </div>
+        <div class="totals">
+          <div>
+            <span>Subtotal</span
+            ><strong
+              >{{ totals().subtotal|currency:'INR':'symbol':'1.0-2' }}</strong
+            >
+          </div>
+          <div>
+            <span>Discount</span
+            ><strong
+              >- {{ totals().discountAmount|currency:'INR':'symbol':'1.0-2'
+              }}</strong
+            >
+          </div>
+          <div>
+            <span>GST</span
+            ><strong
+              >{{ totals().taxAmount|currency:'INR':'symbol':'1.0-2' }}</strong
+            >
+          </div>
+          <div class="grand">
+            <span>Grand total</span
+            ><strong
+              >{{ totals().grandTotal|currency:'INR':'symbol':'1.0-2' }}</strong
+            >
+          </div>
+        </div>
+      </section>
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="document-text-outline" /></span>
+          <div>
+            <h2>Notes & terms</h2>
+            <p>Shown on the final quotation</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="notes">Notes</label
+          ><textarea
+            id="notes"
+            rows="3"
+            formControlName="notes"
+            placeholder="Thank you for your business"
+          ></textarea>
+        </div>
+        <div class="field">
+          <label for="terms">Terms and conditions</label
+          ><textarea id="terms" rows="3" formControlName="terms"></textarea>
+        </div>
+      </section>
+      <ion-button type="submit" expand="block" size="large"
+        ><ion-icon slot="start" name="checkmark-circle" />Save
+        quotation</ion-button
+      >
+    </form>
+  </main></ion-content
+>

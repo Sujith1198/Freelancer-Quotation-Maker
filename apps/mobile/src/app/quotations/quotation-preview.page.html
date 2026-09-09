@@ -1,0 +1,184 @@
+<ion-content [fullscreen]="true"
+  ><main class="page">
+    <header class="header">
+      <a class="back ion-activatable" routerLink="/quotations"
+        ><ion-icon name="arrow-back" /><ion-ripple-effect
+      /></a>
+      <div>
+        <p>PREVIEW</p>
+        <h1>{{ quote()?.number || 'Quotation' }}</h1>
+      </div>
+      <a class="edit ion-activatable" [routerLink]="['/quotations',id,'edit']"
+        ><ion-icon name="create-outline" /><ion-ripple-effect
+      /></a>
+    </header>
+    @if(quote();as document){
+    <section class="status-panel">
+      <div>
+        <small>CURRENT STATUS</small
+        ><strong [class]="document.status.toLowerCase()"
+          >{{ document.status }}</strong
+        >
+      </div>
+      @if(expired){<span class="expired"
+        ><ion-icon name="time-outline" /> Expired</span
+      >}<button (click)="duplicate()">
+        <ion-icon name="copy-outline" /> Duplicate
+      </button>
+    </section>
+    <div class="status-actions">
+      @for(status of statuses;track status){<button
+        [class.active]="document.status===status"
+        [class]="status.toLowerCase()"
+        (click)="setStatus(status)"
+      >
+        {{ status }}</button
+      >}
+    </div>
+    <article class="paper">
+      <header class="paper-head">
+        <div class="company">
+          <div class="logo">
+            @if(business.logoDataUrl){<img
+              [src]="business.logoDataUrl"
+              alt=""
+            />}@else{Q}
+          </div>
+          <div>
+            <h2>{{ business.businessName || 'Your Business' }}</h2>
+            <p>
+              {{ business.addressLine }}{{ business.city?', '+business.city:''
+              }}
+            </p>
+            <p>
+              {{ business.phone }}{{ business.email?' · '+business.email:'' }}
+            </p>
+            @if(business.gstin){
+            <p>GSTIN: {{ business.gstin }}</p>
+            }
+          </div>
+        </div>
+        <div class="quote-title">
+          <span>QUOTATION</span><strong>{{ document.number }}</strong>
+        </div>
+      </header>
+      <section class="meta">
+        <div>
+          <small>QUOTATION TO</small
+          ><strong>{{ document.customerName }}</strong
+          >@if(document.customerBusiness){
+          <p>{{ document.customerBusiness }}</p>
+          }@if(customer){
+          <p>{{ customer.address }}{{ customer.city?', '+customer.city:'' }}</p>
+          <p>
+            {{ customer.phone }}{{ customer.email?' · '+customer.email:'' }}
+          </p>
+          }
+        </div>
+        <div class="dates">
+          <p>
+            <span>Issue date</span
+            ><strong>{{ document.issueDate|date:'d MMM y' }}</strong>
+          </p>
+          <p>
+            <span>Valid until</span
+            ><strong>{{ document.validUntil|date:'d MMM y' }}</strong>
+          </p>
+        </div>
+      </section>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Rate</th>
+              <th>GST</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(item of document.items;track item.id;let i=$index){
+            <tr>
+              <td>{{ i+1 }}</td>
+              <td>
+                <strong>{{ item.name }}</strong>@if(item.description){<small
+                  >{{ item.description }}</small
+                >}
+              </td>
+              <td>{{ item.quantity }} {{ item.unit }}</td>
+              <td>{{ item.rate|currency:'INR':'symbol':'1.0-2' }}</td>
+              <td>{{ item.taxRate }}%</td>
+              <td>{{ item.amount|currency:'INR':'symbol':'1.0-2' }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <section class="paper-bottom">
+        <div class="notes">
+          @if(document.notes){
+          <div>
+            <small>NOTES</small>
+            <p>{{ document.notes }}</p>
+          </div>
+          }@if(document.terms){
+          <div>
+            <small>TERMS & CONDITIONS</small>
+            <p>{{ document.terms }}</p>
+          </div>
+          }
+        </div>
+        <div class="totals">
+          <p>
+            <span>Subtotal</span
+            ><strong
+              >{{ document.subtotal|currency:'INR':'symbol':'1.0-2' }}</strong
+            >
+          </p>
+          @if(document.discountAmount){
+          <p>
+            <span>Discount ({{ document.discountRate }}%)</span
+            ><strong
+              >-{{ document.discountAmount|currency:'INR':'symbol':'1.0-2'
+              }}</strong
+            >
+          </p>
+          }
+          <p>
+            <span>GST</span
+            ><strong
+              >{{ document.taxAmount|currency:'INR':'symbol':'1.0-2' }}</strong
+            >
+          </p>
+          <p class="grand">
+            <span>Total</span
+            ><strong
+              >{{ document.grandTotal|currency:'INR':'symbol':'1.0-2' }}</strong
+            >
+          </p>
+        </div>
+      </section>
+      @if(business.upiId||business.bankName){
+      <footer class="payment">
+        <small>PAYMENT DETAILS</small>@if(business.upiId){
+        <p>UPI: <strong>{{ business.upiId }}</strong></p>
+        }@if(business.bankName){
+        <p>
+          {{ business.bankName }} · {{ business.accountNumber }} · {{
+          business.ifscCode }}
+        </p>
+        }
+      </footer>
+      }
+    </article>
+    }@else{
+    <section class="not-found">
+      <ion-icon name="document-text-outline" />
+      <h2>Quotation not found</h2>
+      <a routerLink="/quotations">Back to quotations</a>
+    </section>
+    }
+  </main></ion-content
+>

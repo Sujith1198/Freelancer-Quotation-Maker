@@ -25,7 +25,9 @@
     <section class="hero-card">
       <div class="hero-copy">
         <span class="eyebrow">SEPTEMBER OVERVIEW</span>
-        <p class="hero-total">₹45,950</p>
+        <p class="hero-total">
+          {{ totalValue | currency: 'INR': 'symbol': '1.0-0' }}
+        </p>
         <p class="hero-caption">Total quotation value</p>
       </div>
       <div class="hero-metric"><span>+18%</span><small>this month</small></div>
@@ -52,7 +54,10 @@
         </div>
       </div>
       <div class="quick-grid">
-        <button class="quick-card primary ion-activatable">
+        <button
+          class="quick-card primary ion-activatable"
+          routerLink="/quotations/new"
+        >
           <span class="quick-icon"><ion-icon name="add" /></span
           ><span
             ><strong>New quotation</strong
@@ -91,17 +96,17 @@
         <span class="stat-icon blue"
           ><ion-icon name="document-text-outline"
         /></span>
-        <div><strong>14</strong><small>Total quotes</small></div>
+        <div><strong>{{ totalQuotes }}</strong><small>Total quotes</small></div>
       </article>
       <article class="stat-card">
         <span class="stat-icon green"
           ><ion-icon name="bar-chart-outline"
         /></span>
-        <div><strong>8</strong><small>Accepted</small></div>
+        <div><strong>{{ acceptedQuotes }}</strong><small>Accepted</small></div>
       </article>
       <article class="stat-card">
         <span class="stat-icon orange"><ion-icon name="time-outline" /></span>
-        <div><strong>4</strong><small>Pending</small></div>
+        <div><strong>{{ pendingQuotes }}</strong><small>Pending</small></div>
       </article>
     </section>
     <section class="recent-section">
@@ -113,16 +118,19 @@
         <ion-button fill="clear" size="small">View all</ion-button>
       </div>
       <div class="quote-list">
-        @for (quote of quotes; track quote.id) {
-        <article class="quote-row">
-          <div class="customer-avatar">{{ quote.customer.charAt(0) }}</div>
+        @for (quote of quotes(); track quote.id) {
+        <article class="quote-row" [routerLink]="['/quotations', quote.id]">
+          <div class="customer-avatar">{{ quote.customerName.charAt(0) }}</div>
           <div class="quote-info">
-            <strong>{{ quote.customer }}</strong
-            ><span>{{ quote.id }} · {{ quote.createdAt | date: 'd MMM' }}</span>
+            <strong>{{ quote.customerName }}</strong
+            ><span
+              >{{ quote.number }} · {{ quote.createdAt | date: 'd MMM' }}</span
+            >
           </div>
           <div class="quote-value">
             <strong
-              >{{ quote.amount | currency: 'INR': 'symbol': '1.0-0' }}</strong
+              >{{ quote.grandTotal | currency: 'INR': 'symbol': '1.0-0'
+              }}</strong
             ><span [class]="'status ' + quote.status.toLowerCase()"
               >{{ quote.status }}</span
             >
@@ -139,7 +147,7 @@
     <button class="nav-item active">
       <ion-icon name="home" /><span>Home</span>
     </button>
-    <button class="nav-item">
+    <button class="nav-item" routerLink="/quotations">
       <ion-icon name="document-text-outline" /><span>Quotes</span>
     </button>
     <button class="create-button" aria-label="Create quotation">

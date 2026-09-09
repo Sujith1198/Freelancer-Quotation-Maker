@@ -1,0 +1,384 @@
+:host {
+  --ink: #15213b;
+  --muted: #75809a;
+  display: block;
+}
+ion-content {
+  --background: #eef1f7;
+}
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: calc(18px + var(--ion-safe-area-top)) 20px 45px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.header p,
+.header h1 {
+  margin: 0;
+}
+.header p {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #98a0b2;
+  font-weight: 800;
+}
+.header h1 {
+  font-size: 21px;
+  color: var(--ink);
+  margin-top: 3px;
+}
+.back,
+.edit {
+  position: relative;
+  overflow: hidden;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dfe3eb;
+  background: #fff;
+  color: var(--ink);
+  font-size: 20px;
+}
+.edit {
+  margin-left: auto;
+  border: 0;
+  color: #fff;
+  background: #3768ed;
+}
+.status-panel {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 15px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #dfe3eb;
+}
+.status-panel div small,
+.status-panel div strong {
+  display: block;
+}
+.status-panel div small {
+  font-size: 7px;
+  color: #9aa2b2;
+}
+.status-panel div strong {
+  font-size: 11px;
+  margin-top: 2px;
+}
+.status-panel .draft {
+  color: #8c94a4;
+}
+.status-panel .sent {
+  color: #3768ed;
+}
+.status-panel .accepted {
+  color: #249a63;
+}
+.status-panel .rejected {
+  color: #dc5361;
+}
+.status-panel .expired {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 9px;
+  border-radius: 9px;
+  background: #fff1f2;
+  color: #d64b5a;
+  font-size: 8px;
+  font-weight: 700;
+}
+.status-panel button {
+  margin-left: auto;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  background: #edf2ff;
+  color: #3768ed;
+  font-size: 9px;
+  font-weight: 700;
+}
+.status-actions {
+  display: flex;
+  gap: 7px;
+  margin: 10px 0 16px;
+}
+.status-actions button {
+  flex: 1;
+  border: 1px solid #dce1ea;
+  border-radius: 10px;
+  padding: 9px;
+  background: #fff;
+  color: #7b8497;
+  font-size: 9px;
+}
+.status-actions button.active.draft {
+  border-color: #8992a5;
+  background: #eef0f4;
+  color: #596174;
+}
+.status-actions button.active.sent {
+  border-color: #3768ed;
+  background: #eaf0ff;
+  color: #2854c9;
+}
+.status-actions button.active.accepted {
+  border-color: #28a46b;
+  background: #e8f8ef;
+  color: #187d4f;
+}
+.status-actions button.active.rejected {
+  border-color: #dc5361;
+  background: #fff0f2;
+  color: #b93947;
+}
+.paper {
+  padding: 34px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 13px 35px rgba(36, 48, 78, 0.1);
+  color: #25314a;
+}
+.paper-head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #315fdc;
+}
+.company {
+  display: flex;
+  gap: 13px;
+}
+.logo {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #3768ed;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+}
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.company h2,
+.company p {
+  margin: 0;
+}
+.company h2 {
+  font-size: 16px;
+}
+.company p {
+  margin-top: 3px;
+  font-size: 8px;
+  color: #75809a;
+}
+.quote-title {
+  text-align: right;
+}
+.quote-title span,
+.quote-title strong {
+  display: block;
+}
+.quote-title span {
+  font-size: 20px;
+  letter-spacing: 2px;
+  font-weight: 300;
+  color: #315fdc;
+}
+.quote-title strong {
+  margin-top: 6px;
+  font-size: 10px;
+  color: #68738a;
+}
+.meta {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px 0;
+}
+.meta small {
+  font-size: 7px;
+  letter-spacing: 1.2px;
+  color: #98a0b0;
+  font-weight: 800;
+}
+.meta strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 12px;
+}
+.meta p {
+  margin: 3px 0 0;
+  font-size: 8px;
+  color: #788298;
+}
+.dates p {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin: 0 0 8px;
+}
+.dates span {
+  font-size: 8px;
+  color: #8490a5;
+}
+.dates strong {
+  margin: 0;
+  font-size: 9px;
+}
+.table-wrap {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8px;
+}
+th {
+  padding: 10px 8px;
+  background: #eef3ff;
+  color: #3158bd;
+  text-align: right;
+  font-size: 7px;
+  letter-spacing: 0.5px;
+}
+th:nth-child(2) {
+  text-align: left;
+}
+td {
+  padding: 11px 8px;
+  border-bottom: 1px solid #e9ecf2;
+  text-align: right;
+}
+td:nth-child(2) {
+  text-align: left;
+  min-width: 130px;
+}
+td strong,
+td small {
+  display: block;
+}
+td small {
+  margin-top: 3px;
+  color: #8b94a6;
+}
+.paper-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  padding-top: 24px;
+}
+.notes {
+  max-width: 50%;
+}
+.notes div {
+  margin-bottom: 13px;
+}
+.notes small,
+.payment small {
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #8490a5;
+  font-weight: 800;
+}
+.notes p {
+  margin: 5px 0 0;
+  font-size: 8px;
+  line-height: 1.5;
+  color: #6f7a8f;
+}
+.totals {
+  min-width: 230px;
+}
+.totals p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 6px 8px;
+  font-size: 8px;
+}
+.totals .grand {
+  margin-top: 5px;
+  padding: 11px;
+  background: #315fdc;
+  color: #fff;
+  font-size: 11px;
+}
+.totals .grand strong {
+  font-size: 13px;
+}
+.payment {
+  margin-top: 23px;
+  padding-top: 14px;
+  border-top: 1px solid #e6e9ef;
+}
+.payment p {
+  margin: 5px 0 0;
+  font-size: 8px;
+}
+.not-found {
+  text-align: center;
+  padding: 60px;
+  background: #fff;
+  border-radius: 20px;
+}
+.not-found ion-icon {
+  font-size: 40px;
+  color: #3768ed;
+}
+.not-found h2 {
+  font-size: 16px;
+}
+.not-found a {
+  color: #3768ed;
+  font-size: 10px;
+}
+@media (max-width: 600px) {
+  .page {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .paper {
+    padding: 20px 14px;
+  }
+  .paper-head {
+    display: block;
+  }
+  .quote-title {
+    text-align: left;
+    margin-top: 20px;
+  }
+  .meta {
+    gap: 20px;
+  }
+  .paper-bottom {
+    display: block;
+  }
+  .notes {
+    max-width: none;
+  }
+  .totals {
+    min-width: 0;
+  }
+  .status-panel {
+    margin: 0 5px;
+  }
+  .status-actions {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}

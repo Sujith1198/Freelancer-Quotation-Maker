@@ -43,5 +43,33 @@ export const appRoutes: Routes = [
     loadComponent: () =>
       import('./catalog/catalog-form.page').then((m) => m.CatalogFormPage),
   },
+  {
+    path: 'quotations',
+    loadComponent: () =>
+      import('./quotations/quotation-list.page').then(
+        (m) => m.QuotationListPage,
+      ),
+  },
+  {
+    path: 'quotations/new',
+    loadComponent: () =>
+      import('./quotations/quotation-form.page').then(
+        (m) => m.QuotationFormPage,
+      ),
+  },
+  {
+    path: 'quotations/:id/edit',
+    loadComponent: () =>
+      import('./quotations/quotation-form.page').then(
+        (m) => m.QuotationFormPage,
+      ),
+  },
+  {
+    path: 'quotations/:id',
+    loadComponent: () =>
+      import('./quotations/quotation-preview.page').then(
+        (m) => m.QuotationPreviewPage,
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];
