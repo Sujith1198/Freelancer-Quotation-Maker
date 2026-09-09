@@ -11,24 +11,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 authorize_request();
 $method = $_SERVER['REQUEST_METHOD'];
 $path = trim((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-$segments = explode('/', $path); $customerId = null; $productId = null; $quotationId = null; $paymentQuotationId = null; $invoiceId = null;
+$segments = explode('/', $path); $customerId = null; $productId = null; $quotationId = null; $paymentQuotationId = null; $invoiceId = null; $reminderId = null;
 $customerPosition = array_search('customers', $segments, true);
 $productPosition = array_search('catalog', $segments, true);
 $quotationPosition = array_search('quotations', $segments, true);
 $paymentPosition = array_search('payments', $segments, true);
 $invoicePosition = array_search('invoices', $segments, true);
+$reminderPosition = array_search('reminders', $segments, true);
 if ($customerPosition !== false) $customerId = $segments[$customerPosition + 1] ?? null;
 if ($productPosition !== false) $productId = $segments[$productPosition + 1] ?? null;
 if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 1] ?? null;
 if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
 if ($invoicePosition !== false) $invoiceId = $segments[$invoicePosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v9']);
+if ($reminderPosition !== false) $reminderId = $segments[$reminderPosition + 1] ?? null;
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v10']);
 
 try {
     $pdo = database();
     if ($productPosition !== false) handle_catalog($pdo, $method, $productId);
     if ($paymentPosition !== false) handle_payments($pdo, $method, $paymentQuotationId);
     if ($invoicePosition !== false) handle_invoices($pdo, $method, $invoiceId);
+    if ($reminderPosition !== false) handle_reminders($pdo, $method, $reminderId);
     if ($quotationPosition !== false) handle_quotations($pdo, $method, $quotationId);
     if ($method === 'GET' && !$customerId) {
         $query = trim($_GET['q'] ?? '');
@@ -213,3 +216,20 @@ function handle_invoices(PDO $pdo, string $method, ?string $invoiceId): never {
 }
 
 function next_invoice_number(PDO $pdo):string{$year=date('Y');$stmt=$pdo->prepare('SELECT number FROM invoices WHERE number LIKE :prefix ORDER BY number DESC LIMIT 1 FOR UPDATE');$stmt->execute(['prefix'=>"INV-{$year}-%"]);$last=$stmt->fetchColumn();$next=$last?(int)substr((string)$last,-3)+1:1;return sprintf('INV-%s-%03d',$year,$next);}
+
+function handle_reminders(PDO $pdo, string $method, ?string $reminderId): never {
+    if ($method==='GET') {
+        $where=$reminderId?' WHERE id=:id':'';$stmt=$pdo->prepare('SELECT * FROM follow_up_reminders'.$where.' ORDER BY scheduled_at');$stmt->execute($reminderId?['id'=>$reminderId]:[]);json_response(['data'=>$reminderId?$stmt->fetch():$stmt->fetchAll()]);
+    }
+    if ($method==='POST'&&!$reminderId) {
+        $body=request_body();$required=['sourceType','sourceId','documentNumber','customerId','customerName','message','scheduledAt'];foreach($required as $field){if(trim((string)($body[$field]??''))==='')json_response(['message'=>"{$field} is required."],422);}
+        if(!in_array($body['sourceType'],['Quotation','Invoice'],true))json_response(['message'=>'Invalid source type.'],422);
+        $id='REM-'.strtoupper(bin2hex(random_bytes(6)));$stmt=$pdo->prepare('INSERT INTO follow_up_reminders (id,source_type,source_id,document_number,customer_id,customer_name,customer_phone,amount,message,scheduled_at) VALUES (:id,:source_type,:source_id,:document_number,:customer_id,:customer_name,:customer_phone,:amount,:message,:scheduled_at) ON DUPLICATE KEY UPDATE customer_phone=VALUES(customer_phone),amount=VALUES(amount),message=VALUES(message),scheduled_at=VALUES(scheduled_at)');
+        $stmt->execute(['id'=>$id,'source_type'=>$body['sourceType'],'source_id'=>$body['sourceId'],'document_number'=>$body['documentNumber'],'customer_id'=>$body['customerId'],'customer_name'=>$body['customerName'],'customer_phone'=>$body['customerPhone']??'','amount'=>(float)($body['amount']??0),'message'=>$body['message'],'scheduled_at'=>date('Y-m-d H:i:s',strtotime($body['scheduledAt']))]);json_response(['data'=>['id'=>$id],'message'=>'Reminder saved.'],201);
+    }
+    if ($method==='PATCH'&&$reminderId) {
+        $body=request_body();$completed=!empty($body['completed'])?date('Y-m-d H:i:s'):null;$stmt=$pdo->prepare('UPDATE follow_up_reminders SET completed_at=:completed_at WHERE id=:id');$stmt->execute(['completed_at'=>$completed,'id'=>$reminderId]);json_response(['message'=>'Reminder updated.']);
+    }
+    if ($method==='DELETE'&&$reminderId) {$stmt=$pdo->prepare('DELETE FROM follow_up_reminders WHERE id=:id');$stmt->execute(['id'=>$reminderId]);json_response(['message'=>'Reminder deleted.']);}
+    json_response(['message'=>'Reminder route not found.'],404);
+}

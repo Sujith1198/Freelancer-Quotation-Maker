@@ -83,6 +83,9 @@ button {
   background: #ff5c5c;
   border: 2px solid #fff;
 }
+.notification-dot.hidden {
+  display: none;
+}
 .hero-card {
   position: relative;
   min-height: 167px;
@@ -236,7 +239,8 @@ button {
   background: #f8faff;
 }
 .quick-card.catalogue,
-.quick-card.invoice {
+.quick-card.invoice,
+.quick-card.reminder {
   grid-column: 1 / -1;
 }
 .quick-icon {

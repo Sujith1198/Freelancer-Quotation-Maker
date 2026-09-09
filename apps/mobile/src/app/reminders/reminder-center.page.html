@@ -1,0 +1,96 @@
+<ion-content [fullscreen]="true">
+  <main class="page">
+    <header class="header">
+      <a class="back" routerLink="/"><ion-icon name="arrow-back" /></a>
+      <div>
+        <p>FOLLOW-UP</p>
+        <h1>Reminder center</h1>
+      </div>
+      <span class="active-count">{{ activeCount }} active</span>
+    </header>
+    <section class="hero">
+      <span><ion-icon name="alarm-outline" /></span>
+      <div>
+        <small>SMART FOLLOW-UP</small>
+        <h2>Never lose a customer</h2>
+        <p>
+          Quote expiry and unpaid invoice reminders are prepared automatically.
+        </p>
+      </div>
+    </section>
+    <nav class="filters">
+      @for(option of ['All','Upcoming','Overdue','Completed'];track option){
+      <button
+        [class.active]="filter()===option"
+        (click)="filter.set($any(option))"
+      >
+        {{ option }}
+      </button>
+      }
+    </nav>
+    @if(visibleItems.length){
+    <section class="reminder-list">
+      @for(item of visibleItems;track item.id){
+      <article
+        class="reminder"
+        [class.overdue]="status(item)==='Overdue'"
+        [class.completed]="status(item)==='Completed'"
+      >
+        <div class="reminder-top">
+          <span class="type-icon"
+            ><ion-icon
+              [name]="item.sourceType==='Invoice'?'document-text-outline':'time-outline'"
+          /></span>
+          <div class="identity">
+            <small>{{ item.sourceType|uppercase }}</small
+            ><strong>{{ item.customerName }}</strong
+            ><a [routerLink]="documentLink(item)">{{ item.documentNumber }}</a>
+          </div>
+          <div class="value">
+            <strong>{{ item.amount|currency:'INR':'symbol':'1.0-0' }}</strong
+            ><span [class]="status(item).toLowerCase()"
+              >{{ status(item) }}</span
+            >
+          </div>
+        </div>
+        <p class="message">{{ item.message }}</p>
+        <div class="date">
+          <ion-icon name="alarm-outline" /> {{ item.scheduledAt|date:'d MMM y,
+          h:mm a' }}
+        </div>
+        @if(status(item)!=='Completed'){
+        <div class="actions">
+          <button
+            class="whatsapp"
+            [disabled]="!item.customerPhone"
+            (click)="openWhatsApp(item)"
+          >
+            <ion-icon name="logo-whatsapp" /> WhatsApp
+          </button>
+          <button [disabled]="!item.customerPhone" (click)="call(item)">
+            <ion-icon name="call-outline" /> Call
+          </button>
+          <button (click)="schedule(item)">
+            <ion-icon name="alarm-outline" /> Alert
+          </button>
+          <button class="done" (click)="complete(item)">
+            <ion-icon name="checkmark-circle-outline" /> Done
+          </button>
+        </div>
+        }@else{
+        <button class="reopen" (click)="reopen(item)">
+          <ion-icon name="refresh-outline" /> Reopen follow-up
+        </button>
+        }
+      </article>
+      }
+    </section>
+    }@else{
+    <section class="empty">
+      <ion-icon name="checkmark-circle-outline" />
+      <h2>All caught up</h2>
+      <p>No reminders in this category.</p>
+    </section>
+    }
+  </main>
+</ion-content>

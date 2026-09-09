@@ -82,14 +82,11 @@ export const appRoutes: Routes = [
       import('./invoices/invoice-detail.page').then((m) => m.InvoiceDetailPage),
   },
   {
-    path: 'invoices',
+    path: 'reminders',
     loadComponent: () =>
-      import('./invoices/invoice-list.page').then((m) => m.InvoiceListPage),
-  },
-  {
-    path: 'invoices/:id',
-    loadComponent: () =>
-      import('./invoices/invoice-detail.page').then((m) => m.InvoiceDetailPage),
+      import('./reminders/reminder-center.page').then(
+        (m) => m.ReminderCenterPage,
+      ),
   },
   { path: '**', redirectTo: '' },
 ];

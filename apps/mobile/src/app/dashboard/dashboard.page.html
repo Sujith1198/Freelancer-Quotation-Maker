@@ -15,9 +15,14 @@
           <h1>{{ businessProfile()?.businessName || 'QuoteSwift' }}</h1>
         </div>
       </div>
-      <button class="icon-button ion-activatable" aria-label="Notifications">
+      <button
+        class="icon-button ion-activatable"
+        aria-label="Reminders"
+        routerLink="/reminders"
+      >
         <ion-icon name="notifications-outline" /><span
           class="notification-dot"
+          [class.hidden]="activeReminderCount===0"
         ></span
         ><ion-ripple-effect />
       </button>
@@ -93,7 +98,7 @@
           <ion-ripple-effect />
         </button>
         <button
-          class="quick-card catalogue ion-activatable"
+          class="quick-card invoice ion-activatable"
           routerLink="/invoices"
         >
           <span class="quick-icon"><ion-icon name="receipt-outline" /></span>
@@ -105,13 +110,17 @@
           <ion-ripple-effect />
         </button>
         <button
-          class="quick-card invoice ion-activatable"
-          routerLink="/invoices"
+          class="quick-card reminder ion-activatable"
+          routerLink="/reminders"
         >
-          <span class="quick-icon"><ion-icon name="receipt-outline" /></span>
+          <span class="quick-icon"
+            ><ion-icon name="notifications-outline"
+          /></span>
           <span
-            ><strong>Invoices & receipts</strong
-            ><small>Track billing and download receipts</small></span
+            ><strong>Smart reminders</strong
+            ><small
+              >{{ activeReminderCount }} follow-ups need attention</small
+            ></span
           >
           <ion-icon class="arrow" name="chevron-forward" />
           <ion-ripple-effect />

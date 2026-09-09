@@ -13,6 +13,9 @@ import { BusinessProfileService } from '../business-profile/business-profile.ser
 import { Quotation } from '../quotations/quotation.model';
 import { QuotationService } from '../quotations/quotation.service';
 import { PaymentService } from '../payments/payment.service';
+import { InvoiceService } from '../invoices/invoice.service';
+import { CustomerService } from '../customers/customer.service';
+import { ReminderService } from '../reminders/reminder.service';
 import {
   add,
   barChartOutline,
@@ -48,6 +51,9 @@ export class DashboardPage implements OnInit {
   private readonly profiles = inject(BusinessProfileService);
   private readonly quotationService = inject(QuotationService);
   private readonly payments = inject(PaymentService);
+  private readonly invoices = inject(InvoiceService);
+  private readonly customers = inject(CustomerService);
+  private readonly reminders = inject(ReminderService);
   readonly businessProfile = signal<BusinessProfile | null>(null);
   readonly quotes = signal<Quotation[]>([]);
   get totalValue(): number {
@@ -76,6 +82,16 @@ export class DashboardPage implements OnInit {
   }
   get outstandingValue(): number {
     return Math.max(this.totalValue - this.collectedValue, 0);
+  }
+  get activeReminderCount(): number {
+    return this.reminders
+      .ensureSmartReminders(
+        this.quotationService.list(),
+        this.invoices.list(),
+        this.customers.list(),
+        this.payments,
+      )
+      .filter((item) => this.reminders.status(item) !== 'Completed').length;
   }
 
   constructor() {
