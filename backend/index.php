@@ -27,16 +27,18 @@ $paymentPosition = array_search('payments', $segments, true);
 $invoicePosition = array_search('invoices', $segments, true);
 $reminderPosition = array_search('reminders', $segments, true);
 $analyticsPosition = array_search('analytics', $segments, true);
+$syncPosition = array_search('sync', $segments, true);
 if ($customerPosition !== false) $customerId = $segments[$customerPosition + 1] ?? null;
 if ($productPosition !== false) $productId = $segments[$productPosition + 1] ?? null;
 if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 1] ?? null;
 if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
 if ($invoicePosition !== false) $invoiceId = $segments[$invoicePosition + 1] ?? null;
 if ($reminderPosition !== false) $reminderId = $segments[$reminderPosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v12', 'authenticatedAccount' => $accountId]);
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false && $syncPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v13', 'authenticatedAccount' => $accountId]);
 
 try {
     $pdo = database();
+    if ($syncPosition !== false) handle_sync($pdo, $method, $accountId);
     if ($productPosition !== false) handle_catalog($pdo, $method, $productId);
     if ($paymentPosition !== false) handle_payments($pdo, $method, $paymentQuotationId);
     if ($invoicePosition !== false) handle_invoices($pdo, $method, $invoiceId);
@@ -103,6 +105,27 @@ function issue_session(PDO $pdo, string $accountId, string $name, string $email)
     $stmt = $pdo->prepare('INSERT INTO api_sessions (id,account_id,token_hash,expires_at) VALUES (:id,:account_id,:token_hash,DATE_ADD(NOW(), INTERVAL 30 DAY))');
     $stmt->execute(['id'=>$id,'account_id'=>$accountId,'token_hash'=>hash('sha256',$token)]);
     json_response(['data'=>['token'=>$token,'expiresIn'=>2592000,'account'=>['id'=>$accountId,'name'=>$name,'email'=>$email]]],201);
+}
+
+function handle_sync(PDO $pdo, string $method, ?string $accountId): never {
+    if (!$accountId) json_response(['message' => 'Bearer account session required for sync.'], 401);
+    if ($method === 'GET') {
+        $stmt = $pdo->prepare('SELECT revision,snapshot_json,updated_at FROM cloud_snapshots WHERE account_id=:account_id LIMIT 1');
+        $stmt->execute(['account_id'=>$accountId]); $snapshot = $stmt->fetch();
+        if (!$snapshot) json_response(['data'=>null]);
+        json_response(['data'=>['revision'=>$snapshot['revision'],'updatedAt'=>$snapshot['updated_at'],'records'=>json_decode((string)$snapshot['snapshot_json'],true,512,JSON_THROW_ON_ERROR)]]);
+    }
+    if ($method === 'PUT') {
+        $body = request_body(); $revision = strtolower(trim((string)($body['revision']??''))); $records = $body['records']??null;
+        if (!preg_match('/^[a-f0-9]{64}$/',$revision) || !is_array($records)) json_response(['message'=>'Valid revision and records are required.'],422);
+        $allowed=['quoteswift.business-profile.v1','quoteswift.customers.v1','quoteswift.catalog.v1','quoteswift.quotations.v1','quoteswift.payments.v1','quoteswift.invoices.v1','quoteswift.reminders.v1'];
+        foreach(array_keys($records) as $key) if(!in_array($key,$allowed,true)) json_response(['message'=>'Snapshot contains an unsupported data key.'],422);
+        $json=json_encode($records,JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR); if(strlen($json)>5*1024*1024) json_response(['message'=>'Snapshot exceeds the 5 MB limit.'],413);
+        $stmt=$pdo->prepare('INSERT INTO cloud_snapshots (account_id,revision,snapshot_json) VALUES (:account_id,:revision,:snapshot_json) ON DUPLICATE KEY UPDATE revision=VALUES(revision),snapshot_json=VALUES(snapshot_json),updated_at=CURRENT_TIMESTAMP');
+        $stmt->execute(['account_id'=>$accountId,'revision'=>$revision,'snapshot_json'=>$json]);
+        json_response(['data'=>['revision'=>$revision,'updatedAt'=>date('c'),'records'=>$records],'message'=>'Cloud backup updated.']);
+    }
+    json_response(['message'=>'Method not allowed.'],405);
 }
 
 function validate_customer(array $body): void {

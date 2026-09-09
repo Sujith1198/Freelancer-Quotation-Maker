@@ -35,18 +35,20 @@
 
       <form (ngSubmit)="submit()">
         @if (registerMode()) {
-        <label>Full name</label>
+        <label for="auth-name">Full name</label>
         <div class="field">
           <ion-icon name="person-outline" /><ion-input
+            id="auth-name"
             name="name"
             [(ngModel)]="name"
             placeholder="Sujith Kumar"
             autocomplete="name"
           />
         </div>
-        <label>Business name <small>optional</small></label>
+        <label for="auth-business">Business name <small>optional</small></label>
         <div class="field">
           <ion-icon name="business-outline" /><ion-input
+            id="auth-business"
             name="business"
             [(ngModel)]="businessName"
             placeholder="Your business"
@@ -54,9 +56,10 @@
           />
         </div>
         }
-        <label>Email address</label>
+        <label for="auth-email">Email address</label>
         <div class="field">
           <ion-icon name="mail-outline" /><ion-input
+            id="auth-email"
             name="email"
             [(ngModel)]="email"
             type="email"
@@ -64,9 +67,10 @@
             autocomplete="email"
           />
         </div>
-        <label>Password</label>
+        <label for="auth-password">Password</label>
         <div class="field">
           <ion-icon name="lock-closed-outline" /><ion-input
+            id="auth-password"
             name="password"
             [(ngModel)]="password"
             [type]="revealPassword() ? 'text' : 'password'"

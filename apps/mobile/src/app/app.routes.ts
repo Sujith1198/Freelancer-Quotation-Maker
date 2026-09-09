@@ -120,5 +120,11 @@ export const appRoutes: Routes = [
     loadComponent: () =>
       import('./analytics/analytics.page').then((m) => m.AnalyticsPage),
   },
+  {
+    path: 'cloud-sync',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./sync/cloud-sync.page').then((m) => m.CloudSyncPage),
+  },
   { path: '**', redirectTo: '' },
 ];

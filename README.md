@@ -1,4 +1,4 @@
-# QuoteSwift V12
+# QuoteSwift V13
 
 Mobile-first quotation maker built with Nx, Angular, Ionic, and Capacitor.
 
@@ -13,10 +13,10 @@ npm run lint
 For Android, install Android Studio and run `npm run android:add`, followed by
 `npm run android:sync` and `npm run android:open`.
 
-V12 includes everything in V1–V11 plus registration and login, protected app
-routes, PBKDF2-hashed offline credentials, persistent sessions, offline guest
-access, an account dashboard, logout, and cloud-ready PHP/MySQL authentication
-with server-side password hashing and expiring Bearer tokens.
+V13 includes everything in V1–V12 plus an HTTPS cloud connection screen,
+account-scoped business backups, manual push and restore, connection health
+checks, SHA-256 snapshot revisions, a 5 MB server safety limit, and offline-first
+local storage fallback. Import backend migrations through `008` in order.
 
 ## Nx workspace
 

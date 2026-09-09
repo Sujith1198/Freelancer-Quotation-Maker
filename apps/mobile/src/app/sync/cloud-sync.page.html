@@ -1,0 +1,128 @@
+<ion-content [fullscreen]="true"
+  ><main class="sync-shell">
+    <header>
+      <ion-button fill="clear" routerLink="/" aria-label="Back"
+        ><ion-icon slot="icon-only" name="arrow-back"
+      /></ion-button>
+      <div>
+        <span>V13 CLOUD</span>
+        <h1>Backup & sync</h1>
+      </div>
+    </header>
+    @if (!sync.config()) {
+    <section class="hero">
+      <div class="hero-icon"><ion-icon name="cloud-done-outline" /></div>
+      <h2>Keep your business protected</h2>
+      <p>
+        Connect your QuoteSwift PHP API to back up customers, products,
+        quotations, payments, invoices and reminders.
+      </p>
+    </section>
+    <section class="connect-card">
+      <label for="cloud-api-url">Secure API URL</label>
+      <div class="field">
+        <ion-icon name="link-outline" /><ion-input
+          id="cloud-api-url"
+          [(ngModel)]="apiUrl"
+          name="apiUrl"
+          type="url"
+          placeholder="https://example.com/api"
+        />
+      </div>
+      <label for="cloud-email">Cloud account email</label>
+      <div class="field">
+        <ion-input
+          id="cloud-email"
+          [(ngModel)]="email"
+          name="email"
+          type="email"
+          placeholder="you@business.com"
+        />
+      </div>
+      <label for="cloud-password">Password</label>
+      <div class="field">
+        <ion-input
+          id="cloud-password"
+          [(ngModel)]="password"
+          name="password"
+          type="password"
+          placeholder="Your cloud password"
+        />
+      </div>
+      <ion-button
+        expand="block"
+        [disabled]="sync.state() === 'connecting'"
+        (click)="connect()"
+        >@if (sync.state() === 'connecting') { <ion-spinner name="crescent" /> }
+        @else { <ion-icon slot="start" name="shield-checkmark-outline" />Connect
+        securely }</ion-button
+      >
+    </section>
+    } @else {
+    <section class="connected">
+      <div class="status-icon"><ion-icon name="checkmark-circle" /></div>
+      <div>
+        <span>CLOUD CONNECTED</span>
+        <h2>{{ sync.config()?.email }}</h2>
+        <p>{{ sync.config()?.apiUrl }}</p>
+      </div>
+    </section>
+    <section class="sync-card">
+      <div class="sync-heading">
+        <div>
+          <small>LAST SUCCESSFUL SYNC</small
+          ><strong
+            >{{ sync.config()?.lastSyncedAt ? (sync.config()?.lastSyncedAt |
+            date:'medium') : 'Not synced yet' }}</strong
+          >
+        </div>
+        <button (click)="verify()" aria-label="Test connection">
+          <ion-icon name="refresh-outline" />
+        </button>
+      </div>
+      <div class="actions">
+        <button
+          class="push"
+          (click)="push()"
+          [disabled]="sync.state() === 'syncing'"
+        >
+          <ion-icon name="cloud-upload-outline" /><strong>Push backup</strong
+          ><small>This device → Cloud</small></button
+        ><button
+          class="pull"
+          (click)="pull()"
+          [disabled]="sync.state() === 'syncing'"
+        >
+          <ion-icon name="cloud-download-outline" /><strong>Restore data</strong
+          ><small>Cloud → This device</small>
+        </button>
+      </div>
+    </section>
+    <section class="coverage">
+      <h3>Included in every backup</h3>
+      <div>
+        <span>Business profile</span><span>Customers</span
+        ><span>Products & services</span><span>Quotations</span
+        ><span>Payments</span><span>Invoices</span><span>Reminders</span>
+      </div>
+    </section>
+    <ion-button
+      class="disconnect"
+      fill="clear"
+      color="danger"
+      expand="block"
+      (click)="sync.disconnect()"
+      ><ion-icon slot="start" name="unlink-outline" />Disconnect
+      cloud</ion-button
+    >
+    } @if (sync.message()) {
+    <p class="message" [class.error]="sync.state() === 'error'">
+      {{ sync.message() }}
+    </p>
+    }
+    <p class="privacy">
+      <ion-icon name="shield-checkmark-outline" /> Your password is sent only to
+      your HTTPS API and is never saved by this screen.
+    </p>
+  </main></ion-content
+>
