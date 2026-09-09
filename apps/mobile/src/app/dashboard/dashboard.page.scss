@@ -274,7 +274,7 @@ button {
 }
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-top: 14px;
 }
@@ -305,6 +305,10 @@ button {
 .stat-icon.orange {
   color: #e59234;
   background: #fff3df;
+}
+.stat-icon.purple {
+  color: #7955d9;
+  background: #f0ebff;
 }
 .stat-card strong,
 .stat-card small {

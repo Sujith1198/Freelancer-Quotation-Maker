@@ -1,4 +1,4 @@
-# QuoteSwift V7
+# QuoteSwift V8
 
 Mobile-first quotation maker built with Nx, Angular, Ionic, and Capacitor.
 
@@ -13,10 +13,12 @@ npm run lint
 For Android, install Android Studio and run `npm run android:add`, followed by
 `npm run android:sync` and `npm run android:open`.
 
-V7 includes everything in V1–V6 plus branded A4 quotation PDFs, Modern and
-Classic PDF styles, automatic multi-page item tables, logo, GST, customer,
-payment and totals sections, browser download/print, Web Share support, and
-native Android/iOS sharing through Capacitor Filesystem and Share plugins.
+V8 includes everything in V1–V7 plus dynamic UPI deep links and QR codes,
+Unpaid/Partial/Paid tracking, payment reference capture, collected and balance
+dashboard metrics, payment status and QR details inside exported PDFs, and a
+MySQL payment ledger/API migration. Payment confirmation is recorded manually;
+automatic bank verification requires a payment gateway and webhook in a later
+version.
 
 ## Nx workspace
 

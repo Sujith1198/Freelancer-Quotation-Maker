@@ -12,6 +12,7 @@ import { BusinessProfile } from '../business-profile/business-profile.model';
 import { BusinessProfileService } from '../business-profile/business-profile.service';
 import { Quotation } from '../quotations/quotation.model';
 import { QuotationService } from '../quotations/quotation.service';
+import { PaymentService } from '../payments/payment.service';
 import {
   add,
   barChartOutline,
@@ -24,6 +25,7 @@ import {
   peopleOutline,
   settingsOutline,
   timeOutline,
+  walletOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -44,6 +46,7 @@ import {
 export class DashboardPage implements OnInit {
   private readonly profiles = inject(BusinessProfileService);
   private readonly quotationService = inject(QuotationService);
+  private readonly payments = inject(PaymentService);
   readonly businessProfile = signal<BusinessProfile | null>(null);
   readonly quotes = signal<Quotation[]>([]);
   get totalValue(): number {
@@ -65,6 +68,14 @@ export class DashboardPage implements OnInit {
       .filter((quote) => quote.status === 'Draft' || quote.status === 'Sent')
       .length;
   }
+  get collectedValue(): number {
+    return this.payments
+      .list()
+      .reduce((sum, payment) => sum + payment.amountPaid, 0);
+  }
+  get outstandingValue(): number {
+    return Math.max(this.totalValue - this.collectedValue, 0);
+  }
 
   constructor() {
     addIcons({
@@ -79,6 +90,7 @@ export class DashboardPage implements OnInit {
       peopleOutline,
       settingsOutline,
       timeOutline,
+      walletOutline,
     });
   }
 

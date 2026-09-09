@@ -63,6 +63,87 @@
         </button>
       </div>
     </section>
+    <section class="payment-card" [class.paid]="payment().status==='Paid'">
+      <div class="payment-summary">
+        <div class="payment-heading">
+          <span class="payment-icon"><ion-icon name="card-outline" /></span>
+          <div>
+            <small>PAYMENT STATUS</small>
+            <h2>{{ payment().status }}</h2>
+          </div>
+          <span [class]="'payment-badge '+payment().status.toLowerCase()">
+            {{ payment().status }}
+          </span>
+        </div>
+        <div class="payment-numbers">
+          <p>
+            <span>Quote total</span>
+            <strong
+              >{{ document.grandTotal|currency:'INR':'symbol':'1.0-2' }}</strong
+            >
+          </p>
+          <p>
+            <span>Amount received</span>
+            <strong class="received"
+              >{{ payment().amountPaid|currency:'INR':'symbol':'1.0-2'
+              }}</strong
+            >
+          </p>
+          <p class="balance">
+            <span>Balance due</span>
+            <strong>{{ balanceDue|currency:'INR':'symbol':'1.0-2' }}</strong>
+          </p>
+        </div>
+        @if(payment().status!=='Paid'){
+        <div class="payment-form">
+          <label>
+            <span>Amount received</span>
+            <input
+              type="number"
+              min="0"
+              [max]="document.grandTotal"
+              [value]="paidAmount()"
+              (input)="paidAmount.set(+$any($event.target).value)"
+            />
+          </label>
+          <label>
+            <span>Transaction reference</span>
+            <input
+              type="text"
+              placeholder="UPI / bank reference"
+              [value]="paymentReference()"
+              (input)="paymentReference.set($any($event.target).value)"
+            />
+          </label>
+          <button class="record-button" (click)="savePayment()">
+            <ion-icon name="checkmark-done-outline" /> Record payment
+          </button>
+        </div>
+        }@else{
+        <div class="paid-message">
+          <ion-icon name="checkmark-done-outline" />
+          <span
+            ><strong>Payment complete</strong>
+            @if(payment().transactionReference){Ref: {{
+            payment().transactionReference }}}</span
+          >
+          <button (click)="resetPayment()">Reset</button>
+        </div>
+        }
+      </div>
+      @if(business.upiId && payment().status!=='Paid'){
+      <aside class="qr-panel">
+        @if(paymentQr()){<img [src]="paymentQr()" alt="UPI payment QR code" />}
+        @else{<span class="qr-loading"><ion-icon name="qr-code-outline" /></span
+        >}
+        <strong>Scan & pay</strong>
+        <small>{{ business.upiId }}</small>
+        <button (click)="openUpi()">
+          Pay {{ balanceDue|currency:'INR':'symbol':'1.0-2' }}
+        </button>
+      </aside>
+      }
+    </section>
     <article class="paper">
       <header class="paper-head">
         <div class="company">

@@ -193,6 +193,211 @@ ion-content {
 .pdf-tools button:disabled {
   opacity: 0.55;
 }
+.payment-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 18px;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid #dfe5f1;
+  border-radius: 20px;
+  background: #fff;
+}
+.payment-card.paid {
+  grid-template-columns: 1fr;
+  border-color: #ccebdc;
+}
+.payment-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.payment-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: #eaf0ff;
+  color: #3768ed;
+  font-size: 19px;
+}
+.payment-heading small,
+.payment-heading h2 {
+  display: block;
+  margin: 0;
+}
+.payment-heading small {
+  color: #98a0b2;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.payment-heading h2 {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 15px;
+}
+.payment-badge {
+  margin-left: auto;
+  padding: 6px 9px;
+  border-radius: 9px;
+  font-size: 8px;
+  font-weight: 800;
+}
+.payment-badge.unpaid {
+  color: #d24d5d;
+  background: #fff0f2;
+}
+.payment-badge.partial {
+  color: #b26b16;
+  background: #fff4df;
+}
+.payment-badge.paid {
+  color: #1f8d5c;
+  background: #e8f8ef;
+}
+.payment-numbers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.payment-numbers p {
+  margin: 0;
+  padding: 10px;
+  border-radius: 11px;
+  background: #f7f8fb;
+}
+.payment-numbers span,
+.payment-numbers strong {
+  display: block;
+}
+.payment-numbers span {
+  color: #8992a5;
+  font-size: 7px;
+}
+.payment-numbers strong {
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 11px;
+}
+.payment-numbers .received {
+  color: #249a63;
+}
+.payment-numbers .balance strong {
+  color: #d25766;
+}
+.payment-form {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr auto;
+  align-items: end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.payment-form label span {
+  display: block;
+  margin: 0 0 5px 2px;
+  color: #7f899d;
+  font-size: 7px;
+  font-weight: 700;
+}
+.payment-form input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid #dfe4ed;
+  border-radius: 10px;
+  padding: 10px;
+  outline: none;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+  font-size: 9px;
+}
+.payment-form input:focus {
+  border-color: #3768ed;
+}
+.record-button,
+.qr-panel button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #3768ed;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+}
+.record-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.qr-panel {
+  padding: 12px;
+  border-radius: 15px;
+  text-align: center;
+  background: #f6f9ff;
+}
+.qr-panel img,
+.qr-loading {
+  display: grid;
+  width: 104px;
+  height: 104px;
+  margin: 0 auto 6px;
+  border-radius: 9px;
+  place-items: center;
+  background: #fff;
+}
+.qr-loading {
+  color: #3768ed;
+  font-size: 34px;
+}
+.qr-panel strong,
+.qr-panel small {
+  display: block;
+}
+.qr-panel strong {
+  color: var(--ink);
+  font-size: 10px;
+}
+.qr-panel small {
+  overflow: hidden;
+  margin: 3px 0 8px;
+  color: #778298;
+  font-size: 7px;
+  text-overflow: ellipsis;
+}
+.qr-panel button {
+  width: 100%;
+}
+.paid-message {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 13px;
+  padding: 11px;
+  border-radius: 12px;
+  color: #1f8055;
+  background: #eefaf4;
+  font-size: 9px;
+}
+.paid-message ion-icon {
+  font-size: 20px;
+}
+.paid-message span {
+  flex: 1;
+}
+.paid-message strong {
+  display: block;
+}
+.paid-message button {
+  border: 0;
+  background: transparent;
+  color: #557565;
+  font-size: 8px;
+  text-decoration: underline;
+}
 .paper {
   padding: 34px;
   border-radius: 8px;
@@ -444,5 +649,22 @@ td small {
   }
   .pdf-actions button {
     flex: 1;
+  }
+  .payment-card {
+    display: block;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  .payment-numbers {
+    grid-template-columns: 1fr;
+  }
+  .payment-form {
+    grid-template-columns: 1fr;
+  }
+  .record-button {
+    justify-content: center;
+  }
+  .qr-panel {
+    margin-top: 14px;
   }
 }

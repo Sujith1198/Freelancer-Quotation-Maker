@@ -30,7 +30,10 @@
         </p>
         <p class="hero-caption">Total quotation value</p>
       </div>
-      <div class="hero-metric"><span>+18%</span><small>this month</small></div>
+      <div class="hero-metric">
+        <span>{{ collectedValue | currency: 'INR': 'symbol': '1.0-0' }}</span>
+        <small>payments collected</small>
+      </div>
       <div class="hero-shape shape-one"></div>
       <div class="hero-shape shape-two"></div>
     </section>
@@ -97,6 +100,15 @@
           ><ion-icon name="document-text-outline"
         /></span>
         <div><strong>{{ totalQuotes }}</strong><small>Total quotes</small></div>
+      </article>
+      <article class="stat-card">
+        <span class="stat-icon purple"><ion-icon name="wallet-outline" /></span>
+        <div>
+          <strong
+            >{{ outstandingValue | currency: 'INR': 'symbol': '1.0-0' }}</strong
+          >
+          <small>Balance due</small>
+        </div>
       </article>
       <article class="stat-card">
         <span class="stat-icon green"

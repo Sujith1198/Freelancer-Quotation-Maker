@@ -11,18 +11,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 authorize_request();
 $method = $_SERVER['REQUEST_METHOD'];
 $path = trim((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-$segments = explode('/', $path); $customerId = null; $productId = null; $quotationId = null;
+$segments = explode('/', $path); $customerId = null; $productId = null; $quotationId = null; $paymentQuotationId = null;
 $customerPosition = array_search('customers', $segments, true);
 $productPosition = array_search('catalog', $segments, true);
 $quotationPosition = array_search('quotations', $segments, true);
+$paymentPosition = array_search('payments', $segments, true);
 if ($customerPosition !== false) $customerId = $segments[$customerPosition + 1] ?? null;
 if ($productPosition !== false) $productId = $segments[$productPosition + 1] ?? null;
 if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v5']);
+if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v8']);
 
 try {
     $pdo = database();
     if ($productPosition !== false) handle_catalog($pdo, $method, $productId);
+    if ($paymentPosition !== false) handle_payments($pdo, $method, $paymentQuotationId);
     if ($quotationPosition !== false) handle_quotations($pdo, $method, $quotationId);
     if ($method === 'GET' && !$customerId) {
         $query = trim($_GET['q'] ?? '');
@@ -141,3 +144,36 @@ function validate_quotation(array $body): void {
 
 function quotation_params(array $body,string $id,string $number):array{return['id'=>$id,'number'=>$number,'customer_id'=>$body['customerId'],'customer_name'=>$body['customerName']??'','customer_business'=>$body['customerBusiness']??'','issue_date'=>$body['issueDate'],'valid_until'=>$body['validUntil'],'status'=>$body['status']??'Draft','discount_rate'=>(float)($body['discountRate']??0),'subtotal'=>(float)$body['subtotal'],'discount_amount'=>(float)$body['discountAmount'],'taxable_amount'=>(float)$body['taxableAmount'],'tax_amount'=>(float)$body['taxAmount'],'grand_total'=>(float)$body['grandTotal'],'notes'=>$body['notes']??'','terms'=>$body['terms']??''];}
 function next_quotation_number(PDO $pdo):string{$year=date('Y');$stmt=$pdo->prepare('SELECT number FROM quotations WHERE number LIKE :prefix ORDER BY number DESC LIMIT 1 FOR UPDATE');$stmt->execute(['prefix'=>"QT-{$year}-%"]);$last=$stmt->fetchColumn();$next=$last?(int)substr((string)$last,-3)+1:1;return sprintf('QT-%s-%03d',$year,$next);}
+
+function handle_payments(PDO $pdo, string $method, ?string $quotationId): never {
+    if ($method === 'GET' && !$quotationId) {
+        $stmt = $pdo->query('SELECT * FROM quotation_payments ORDER BY updated_at DESC');
+        json_response(['data' => $stmt->fetchAll()]);
+    }
+    if ($method === 'GET' && $quotationId) {
+        $stmt = $pdo->prepare('SELECT * FROM quotation_payments WHERE quotation_id=:quotation_id');
+        $stmt->execute(['quotation_id' => $quotationId]);
+        json_response(['data' => $stmt->fetch() ?: ['quotation_id'=>$quotationId,'status'=>'Unpaid','amount_paid'=>0]]);
+    }
+    if ($method === 'PUT' && $quotationId) {
+        $body = request_body();
+        if (!is_numeric($body['amountPaid'] ?? null) || (float)$body['amountPaid'] < 0) {
+            json_response(['message' => 'Amount paid must be zero or greater.'], 422);
+        }
+        $total = $pdo->prepare('SELECT grand_total FROM quotations WHERE id=:id');
+        $total->execute(['id' => $quotationId]);
+        $grandTotal = $total->fetchColumn();
+        if ($grandTotal === false) json_response(['message' => 'Quotation not found.'], 404);
+        $amount = min((float)$body['amountPaid'], (float)$grandTotal);
+        $status = $amount <= 0 ? 'Unpaid' : ($amount >= (float)$grandTotal ? 'Paid' : 'Partial');
+        $stmt = $pdo->prepare("INSERT INTO quotation_payments (quotation_id,status,amount_paid,transaction_reference,paid_at) VALUES (:quotation_id,:status,:amount_paid,:transaction_reference,:paid_at) ON DUPLICATE KEY UPDATE status=VALUES(status),amount_paid=VALUES(amount_paid),transaction_reference=VALUES(transaction_reference),paid_at=VALUES(paid_at)");
+        $stmt->execute(['quotation_id'=>$quotationId,'status'=>$status,'amount_paid'=>$amount,'transaction_reference'=>trim((string)($body['transactionReference']??'')),'paid_at'=>$amount>0?date('Y-m-d H:i:s'):null]);
+        json_response(['data'=>['quotationId'=>$quotationId,'status'=>$status,'amountPaid'=>$amount],'message'=>'Payment updated.']);
+    }
+    if ($method === 'DELETE' && $quotationId) {
+        $stmt = $pdo->prepare('DELETE FROM quotation_payments WHERE quotation_id=:quotation_id');
+        $stmt->execute(['quotation_id'=>$quotationId]);
+        json_response(['message'=>'Payment reset.']);
+    }
+    json_response(['message'=>'Payment route not found.'],404);
+}

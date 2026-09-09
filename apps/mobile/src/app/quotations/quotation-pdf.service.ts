@@ -4,8 +4,10 @@ import { Directory, Filesystem } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import QRCode from 'qrcode';
 import { BusinessProfile } from '../business-profile/business-profile.model';
 import { Customer } from '../customers/customer.model';
+import { PaymentRecord } from '../payments/payment.model';
 import { Quotation } from './quotation.model';
 
 export type PdfTemplate = 'modern' | 'classic';
@@ -17,8 +19,10 @@ export class QuotationPdfService {
     business: BusinessProfile,
     customer: Customer | undefined,
     template: PdfTemplate,
+    payment?: PaymentRecord,
   ): Promise<void> {
-    this.create(quote, business, customer, template).save(this.fileName(quote));
+    const pdf = await this.create(quote, business, customer, template, payment);
+    pdf.save(this.fileName(quote));
   }
 
   async print(
@@ -26,10 +30,10 @@ export class QuotationPdfService {
     business: BusinessProfile,
     customer: Customer | undefined,
     template: PdfTemplate,
+    payment?: PaymentRecord,
   ): Promise<void> {
-    const url = URL.createObjectURL(
-      this.create(quote, business, customer, template).output('blob'),
-    );
+    const pdf = await this.create(quote, business, customer, template, payment);
+    const url = URL.createObjectURL(pdf.output('blob'));
     const frame = document.createElement('iframe');
     frame.style.position = 'fixed';
     frame.style.width = '1px';
@@ -52,8 +56,9 @@ export class QuotationPdfService {
     business: BusinessProfile,
     customer: Customer | undefined,
     template: PdfTemplate,
+    payment?: PaymentRecord,
   ): Promise<'shared' | 'downloaded'> {
-    const pdf = this.create(quote, business, customer, template);
+    const pdf = await this.create(quote, business, customer, template, payment);
     const fileName = this.fileName(quote);
 
     if (Capacitor.isNativePlatform()) {
@@ -88,12 +93,13 @@ export class QuotationPdfService {
     return 'downloaded';
   }
 
-  create(
+  async create(
     quote: Quotation,
     business: BusinessProfile,
     customer: Customer | undefined,
     template: PdfTemplate = 'modern',
-  ): jsPDF {
+    payment?: PaymentRecord,
+  ): Promise<jsPDF> {
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
     const modern = template === 'modern';
     const accent: [number, number, number] = modern
@@ -302,8 +308,15 @@ export class QuotationPdfService {
       pdf.text(pdf.splitTextToSize(quote.terms, 92), 16, leftY + 5);
     }
 
-    const paymentY = Math.max(y + 20, leftY + 18);
-    if (paymentY < 274 && (business.upiId || business.bankName)) {
+    let paymentY = Math.max(y + 20, leftY + 18);
+    if (
+      paymentY > 254 &&
+      (business.upiId || business.bankName || payment?.status !== 'Unpaid')
+    ) {
+      pdf.addPage();
+      paymentY = 24;
+    }
+    if (business.upiId || business.bankName || payment?.status !== 'Unpaid') {
       pdf.setDrawColor(222, 226, 234);
       pdf.line(16, paymentY - 5, 194, paymentY - 5);
       pdf.setFont('helvetica', 'bold');
@@ -312,7 +325,7 @@ export class QuotationPdfService {
       pdf.text('PAYMENT DETAILS', 16, paymentY);
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(...ink);
-      const payment = [
+      const paymentDetails = [
         business.upiId ? `UPI: ${business.upiId}` : '',
         business.bankName
           ? [
@@ -325,7 +338,44 @@ export class QuotationPdfService {
               .join('  |  ')
           : '',
       ].filter(Boolean);
-      pdf.text(payment, 16, paymentY + 5, { lineHeightFactor: 1.4 });
+      pdf.text(paymentDetails, 16, paymentY + 5, { lineHeightFactor: 1.4 });
+      const amountPaid = payment?.amountPaid ?? 0;
+      const balance = Math.max(quote.grandTotal - amountPaid, 0);
+      if (payment && payment.status !== 'Unpaid') {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(
+          payment.status === 'Paid' ? 35 : 212,
+          payment.status === 'Paid' ? 145 : 137,
+          payment.status === 'Paid' ? 92 : 30,
+        );
+        pdf.text(
+          `${payment.status.toUpperCase()}  |  Paid ${money(amountPaid)}${payment.transactionReference ? `  |  Ref: ${payment.transactionReference}` : ''}`,
+          16,
+          paymentY + 17,
+        );
+      }
+      if (business.upiId && balance > 0) {
+        const params = new URLSearchParams({
+          pa: business.upiId,
+          pn: business.businessName || business.ownerName || 'QuoteSwift',
+          am: balance.toFixed(2),
+          cu: 'INR',
+          tn: `Payment for ${quote.number}`,
+          tr: quote.number,
+        });
+        const qr = await QRCode.toDataURL(`upi://pay?${params.toString()}`, {
+          width: 420,
+          margin: 1,
+          errorCorrectionLevel: 'M',
+        });
+        pdf.addImage(qr, 'PNG', 164, paymentY, 30, 30, undefined, 'FAST');
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(...muted);
+        pdf.setFontSize(6.5);
+        pdf.text(`Scan to pay ${money(balance)}`, 179, paymentY + 34, {
+          align: 'center',
+        });
+      }
     }
     const pages = pdf.getNumberOfPages();
     for (let page = 1; page <= pages; page += 1) {

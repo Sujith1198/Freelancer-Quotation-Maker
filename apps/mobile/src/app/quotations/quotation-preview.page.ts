@@ -16,13 +16,18 @@ import {
   createOutline,
   documentTextOutline,
   downloadOutline,
+  cardOutline,
+  checkmarkDoneOutline,
   printOutline,
+  qrCodeOutline,
   personOutline,
   shareSocialOutline,
   timeOutline,
 } from 'ionicons/icons';
 import { BusinessProfileService } from '../business-profile/business-profile.service';
 import { CustomerService } from '../customers/customer.service';
+import { PaymentRecord } from '../payments/payment.model';
+import { PaymentService } from '../payments/payment.service';
 import { Quotation, QuotationStatus } from './quotation.model';
 import { PdfTemplate, QuotationPdfService } from './quotation-pdf.service';
 import { QuotationService } from './quotation.service';
@@ -48,10 +53,15 @@ export class QuotationPreviewPage {
   private readonly customers = inject(CustomerService);
   private readonly toasts = inject(ToastController);
   private readonly pdf = inject(QuotationPdfService);
+  private readonly payments = inject(PaymentService);
   readonly id = this.route.snapshot.paramMap.get('id') ?? '';
   readonly quote = signal<Quotation | undefined>(this.service.find(this.id));
   readonly pdfTemplate = signal<PdfTemplate>('modern');
   readonly exporting = signal(false);
+  readonly payment = signal<PaymentRecord>(this.payments.get(this.id));
+  readonly paymentQr = signal('');
+  readonly paidAmount = signal(this.payment().amountPaid);
+  readonly paymentReference = signal(this.payment().transactionReference);
   readonly business = inject(BusinessProfileService).get();
   readonly customer = this.customers.find(this.quote()?.customerId ?? '');
   readonly statuses: QuotationStatus[] = [
@@ -69,11 +79,15 @@ export class QuotationPreviewPage {
       createOutline,
       documentTextOutline,
       downloadOutline,
+      cardOutline,
+      checkmarkDoneOutline,
       printOutline,
+      qrCodeOutline,
       personOutline,
       shareSocialOutline,
       timeOutline,
     });
+    void this.refreshPaymentQr();
   }
   selectTemplate(template: PdfTemplate): void {
     this.pdfTemplate.set(template);
@@ -88,6 +102,7 @@ export class QuotationPreviewPage {
         this.business,
         this.customer,
         this.pdfTemplate(),
+        this.payment(),
       );
       await this.notice('PDF downloaded', 'success');
     } catch {
@@ -105,6 +120,7 @@ export class QuotationPreviewPage {
         this.business,
         this.customer,
         this.pdfTemplate(),
+        this.payment(),
       );
     } catch {
       await this.notice('Could not open print preview', 'danger');
@@ -120,6 +136,7 @@ export class QuotationPreviewPage {
         this.business,
         this.customer,
         this.pdfTemplate(),
+        this.payment(),
       );
       await this.notice(
         result === 'shared'
@@ -134,6 +151,47 @@ export class QuotationPreviewPage {
     } finally {
       this.exporting.set(false);
     }
+  }
+  get balanceDue(): number {
+    const quote = this.quote();
+    return quote ? this.payments.balance(quote, this.payment()) : 0;
+  }
+  openUpi(): void {
+    const quote = this.quote();
+    if (!quote || !this.business.upiId || this.balanceDue <= 0) return;
+    window.location.href = this.payments.paymentUri(
+      quote,
+      this.business,
+      this.payment(),
+    );
+  }
+  async savePayment(): Promise<void> {
+    const quote = this.quote();
+    if (!quote) return;
+    const record = this.payments.save(
+      quote,
+      this.paidAmount(),
+      this.paymentReference(),
+    );
+    this.payment.set(record);
+    this.paidAmount.set(record.amountPaid);
+    await this.refreshPaymentQr();
+    await this.notice(`Payment marked ${record.status}`, 'success');
+  }
+  async resetPayment(): Promise<void> {
+    const record = this.payments.reset(this.id);
+    this.payment.set(record);
+    this.paidAmount.set(0);
+    this.paymentReference.set('');
+    await this.refreshPaymentQr();
+    await this.notice('Payment reset to Unpaid');
+  }
+  private async refreshPaymentQr(): Promise<void> {
+    const quote = this.quote();
+    if (!quote) return;
+    this.paymentQr.set(
+      await this.payments.qrDataUrl(quote, this.business, this.payment()),
+    );
   }
   private async notice(message: string, color?: string): Promise<void> {
     const toast = await this.toasts.create({
