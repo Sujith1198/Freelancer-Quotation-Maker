@@ -13,8 +13,9 @@ npm run lint
 For Android, install Android Studio and run `npm run android:add`, followed by
 `npm run android:sync` and `npm run android:open`.
 
-V1 includes the responsive dashboard, quotation summary, quick actions, recent
-quotation list, navigation shell, Ionic theming, and Capacitor configuration.
+V2 includes everything in V1 plus a complete business-profile workflow: logo
+upload, company and contact details, GSTIN, address, UPI and bank details,
+validation, device-local persistence, and dashboard profile integration.
 
 ## Nx workspace
 

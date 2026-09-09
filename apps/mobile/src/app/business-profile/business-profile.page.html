@@ -1,0 +1,220 @@
+<ion-content [fullscreen]="true">
+  <main class="profile-page">
+    <header class="page-header">
+      <button
+        class="back-button ion-activatable"
+        (click)="back()"
+        aria-label="Back"
+      >
+        <ion-icon name="arrow-back" /><ion-ripple-effect />
+      </button>
+      <div>
+        <p>SETTINGS</p>
+        <h1>Business profile</h1>
+      </div>
+    </header>
+
+    <section class="intro-card">
+      <div class="logo-preview">
+        @if (logoDataUrl()) {
+        <img [src]="logoDataUrl()" alt="Business logo" /> } @else {
+        <ion-icon name="business-outline" /> }
+      </div>
+      <div class="intro-copy">
+        <h2>Your quotation identity</h2>
+        <p>This information will appear on every PDF quotation.</p>
+      </div>
+      <label class="upload-button"
+        ><ion-icon name="camera-outline" /><span>Logo</span
+        ><input
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          (change)="chooseLogo($event)"
+      /></label>
+    </section>
+    @if (logoError()) {
+    <p class="logo-error">{{ logoError() }}</p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="business-outline" /></span>
+          <div>
+            <h2>Business details</h2>
+            <p>Basic information about your company</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="businessName">Business name <b>*</b></label
+          ><input
+            id="businessName"
+            formControlName="businessName"
+            placeholder="Example: Sujith Digital Studio"
+          />@if (hasError('businessName','required')) {
+          <small>Business name is required.</small> }
+        </div>
+        <div class="field">
+          <label for="ownerName">Owner name <b>*</b></label
+          ><input
+            id="ownerName"
+            formControlName="ownerName"
+            placeholder="Your full name"
+          />@if (hasError('ownerName','required')) {
+          <small>Owner name is required.</small> }
+        </div>
+        <div class="two-column">
+          <div class="field">
+            <label for="phone">Phone <b>*</b></label>
+            <div class="input-prefix">
+              <span>+91</span
+              ><input
+                id="phone"
+                inputmode="numeric"
+                maxlength="10"
+                formControlName="phone"
+                placeholder="9876543210"
+              />
+            </div>
+            @if (hasError('phone','pattern')) {
+            <small>Enter a valid Indian mobile number.</small> }
+          </div>
+          <div class="field">
+            <label for="email">Email</label
+            ><input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="hello@business.com"
+            />@if (hasError('email','email')) {
+            <small>Enter a valid email address.</small> }
+          </div>
+        </div>
+        <div class="field">
+          <label for="gstin">GSTIN <em>Optional</em></label
+          ><input
+            id="gstin"
+            formControlName="gstin"
+            maxlength="15"
+            class="uppercase"
+            placeholder="33ABCDE1234F1Z5"
+          />@if (hasError('gstin','pattern')) {
+          <small>Enter a valid 15-character GSTIN.</small> }
+        </div>
+      </section>
+
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="location-outline" /></span>
+          <div>
+            <h2>Business address</h2>
+            <p>Used in quotation headers</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="addressLine">Address <b>*</b></label
+          ><textarea
+            id="addressLine"
+            rows="3"
+            formControlName="addressLine"
+            placeholder="Door number, street and area"
+          ></textarea>
+        </div>
+        <div class="two-column">
+          <div class="field">
+            <label for="city">City <b>*</b></label
+            ><input id="city" formControlName="city" placeholder="Chennai" />
+          </div>
+          <div class="field">
+            <label for="state">State <b>*</b></label
+            ><input id="state" formControlName="state" />
+          </div>
+        </div>
+        <div class="field half">
+          <label for="postalCode">PIN code <b>*</b></label
+          ><input
+            id="postalCode"
+            inputmode="numeric"
+            maxlength="6"
+            formControlName="postalCode"
+            placeholder="600001"
+          />@if (hasError('postalCode','pattern')) {
+          <small>Enter a valid 6-digit PIN code.</small> }
+        </div>
+      </section>
+
+      <section class="form-card">
+        <div class="card-title">
+          <span><ion-icon name="wallet-outline" /></span>
+          <div>
+            <h2>Payment details</h2>
+            <p>Let customers know how to pay you</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="upiId">UPI ID <em>Optional</em></label
+          ><input
+            id="upiId"
+            formControlName="upiId"
+            placeholder="business@upi"
+          />@if (hasError('upiId','pattern')) {
+          <small>Enter a valid UPI ID.</small> }
+        </div>
+        <div class="divider"><span>Bank account (optional)</span></div>
+        <div class="two-column">
+          <div class="field">
+            <label for="bankName">Bank name</label
+            ><input
+              id="bankName"
+              formControlName="bankName"
+              placeholder="Bank name"
+            />
+          </div>
+          <div class="field">
+            <label for="accountName">Account holder</label
+            ><input
+              id="accountName"
+              formControlName="accountName"
+              placeholder="Account holder name"
+            />
+          </div>
+        </div>
+        <div class="two-column">
+          <div class="field">
+            <label for="accountNumber">Account number</label
+            ><input
+              id="accountNumber"
+              inputmode="numeric"
+              formControlName="accountNumber"
+              placeholder="Account number"
+            />@if (hasError('accountNumber','pattern')) {
+            <small>Use 9–18 digits.</small> }
+          </div>
+          <div class="field">
+            <label for="ifscCode">IFSC code</label
+            ><input
+              id="ifscCode"
+              class="uppercase"
+              maxlength="11"
+              formControlName="ifscCode"
+              placeholder="SBIN0001234"
+            />@if (hasError('ifscCode','pattern')) {
+            <small>Enter a valid IFSC code.</small> }
+          </div>
+        </div>
+      </section>
+
+      <div class="privacy-note">
+        <ion-icon name="card-outline" />
+        <p>
+          Your information is currently stored only on this device. Secure cloud
+          sync will be added later.
+        </p>
+      </div>
+      <ion-button type="submit" expand="block" size="large"
+        ><ion-icon slot="start" name="checkmark-circle" />Save business
+        profile</ion-button
+      >
+    </form>
+  </main>
+</ion-content>

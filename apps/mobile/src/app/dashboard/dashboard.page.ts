@@ -1,5 +1,6 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   IonButton,
   IonContent,
@@ -7,6 +8,8 @@ import {
   IonRippleEffect,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
+import { BusinessProfile } from '../business-profile/business-profile.model';
+import { BusinessProfileService } from '../business-profile/business-profile.service';
 import {
   add,
   barChartOutline,
@@ -39,11 +42,14 @@ interface RecentQuote {
     IonContent,
     IonIcon,
     IonRippleEffect,
+    RouterLink,
   ],
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.scss',
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit {
+  private readonly profiles = inject(BusinessProfileService);
+  readonly businessProfile = signal<BusinessProfile | null>(null);
   readonly quotes: RecentQuote[] = [
     {
       id: 'QT-2026-014',
@@ -81,5 +87,10 @@ export class DashboardPage {
       settingsOutline,
       timeOutline,
     });
+  }
+
+  ngOnInit(): void {
+    const profile = this.profiles.get();
+    this.businessProfile.set(profile.businessName ? profile : null);
   }
 }

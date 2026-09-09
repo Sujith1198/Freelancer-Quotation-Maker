@@ -2,10 +2,17 @@
   <main class="dashboard">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark">Q</div>
+        <a
+          class="brand-mark"
+          routerLink="/business-profile"
+          aria-label="Business profile"
+        >
+          @if (businessProfile()?.logoDataUrl) {
+          <img [src]="businessProfile()?.logoDataUrl" alt="" /> } @else { Q }
+        </a>
         <div>
           <p>Welcome back</p>
-          <h1>QuoteSwift</h1>
+          <h1>{{ businessProfile()?.businessName || 'QuoteSwift' }}</h1>
         </div>
       </div>
       <button class="icon-button ion-activatable" aria-label="Notifications">
@@ -25,6 +32,18 @@
       <div class="hero-shape shape-one"></div>
       <div class="hero-shape shape-two"></div>
     </section>
+    @if (!businessProfile()) {
+    <a class="setup-banner" routerLink="/business-profile">
+      <span><ion-icon name="settings-outline" /></span>
+      <div>
+        <strong>Set up your business profile</strong
+        ><small
+          >Add your logo and payment details before creating quotes.</small
+        >
+      </div>
+      <ion-icon class="arrow" name="chevron-forward" />
+    </a>
+    }
     <section class="quick-section">
       <div class="section-heading">
         <div>
@@ -117,7 +136,7 @@
     <button class="nav-item">
       <ion-icon name="people-outline" /><span>Customers</span>
     </button>
-    <button class="nav-item">
+    <button class="nav-item" routerLink="/business-profile">
       <ion-icon name="settings-outline" /><span>Settings</span>
     </button>
   </nav>
