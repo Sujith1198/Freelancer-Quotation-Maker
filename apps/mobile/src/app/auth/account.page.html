@@ -1,0 +1,83 @@
+<ion-content [fullscreen]="true">
+  <main class="account-shell">
+    <header>
+      <ion-button fill="clear" routerLink="/" aria-label="Back"
+        ><ion-icon slot="icon-only" name="arrow-back"
+      /></ion-button>
+      <div>
+        <span>SECURITY & ACCESS</span>
+        <h1>My account</h1>
+      </div>
+    </header>
+
+    <section class="profile-card">
+      <div class="avatar">
+        {{ (auth.session()?.name || 'O').charAt(0).toUpperCase() }}
+      </div>
+      <div class="profile-copy">
+        <h2>{{ auth.session()?.name }}</h2>
+        <p>{{ auth.session()?.email || 'This device only' }}</p>
+        <span [class.offline]="auth.session()?.mode === 'offline'">
+          <ion-icon
+            [name]="auth.session()?.mode === 'account' ? 'cloud-done-outline' : 'shield-checkmark-outline'"
+          />
+          {{ auth.session()?.mode === 'account' ? 'Account session' : 'Offline
+          session' }}
+        </span>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div>
+        <span><ion-icon name="business-outline" /></span>
+        <div>
+          <small>WORKSPACE</small
+          ><strong>{{ auth.session()?.businessName || 'QuoteSwift' }}</strong>
+        </div>
+      </div>
+      <a routerLink="/business-profile">Edit business</a>
+    </section>
+
+    <section class="stats">
+      <article>
+        <ion-icon name="people-outline" /><strong>{{ counts.customers }}</strong
+        ><small>Customers</small>
+      </article>
+      <article>
+        <ion-icon name="document-text-outline" /><strong
+          >{{ counts.quotations }}</strong
+        ><small>Quotations</small>
+      </article>
+      <article>
+        <ion-icon name="receipt-outline" /><strong>{{ counts.invoices }}</strong
+        ><small>Invoices</small>
+      </article>
+    </section>
+
+    <section class="security-card">
+      <div class="security-icon">
+        <ion-icon name="shield-checkmark-outline" />
+      </div>
+      <div>
+        <h3>Your data stays yours</h3>
+        <p>
+          Password hashes are stored instead of readable passwords. Offline
+          records remain available on this device, and the V12 API is ready for
+          expiring cloud sessions.
+        </p>
+      </div>
+    </section>
+
+    <ion-button
+      class="logout"
+      expand="block"
+      fill="outline"
+      color="danger"
+      (click)="logout()"
+      ><ion-icon slot="start" name="log-out-outline" />Log out</ion-button
+    >
+    <p class="footnote">
+      Logging out does not delete your customers, quotations or invoices.
+    </p>
+  </main>
+</ion-content>

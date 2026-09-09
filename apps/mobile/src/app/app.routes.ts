@@ -1,13 +1,26 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth/auth.guard';
 
 export const appRoutes: Routes = [
   {
+    path: 'login',
+    loadComponent: () => import('./auth/login.page').then((m) => m.LoginPage),
+  },
+  {
+    path: 'account',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./auth/account.page').then((m) => m.AccountPage),
+  },
+  {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./dashboard/dashboard.page').then((m) => m.DashboardPage),
   },
   {
     path: 'business-profile',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./business-profile/business-profile.page').then(
         (m) => m.BusinessProfilePage,
@@ -15,36 +28,43 @@ export const appRoutes: Routes = [
   },
   {
     path: 'customers',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./customers/customer-list.page').then((m) => m.CustomerListPage),
   },
   {
     path: 'customers/new',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./customers/customer-form.page').then((m) => m.CustomerFormPage),
   },
   {
     path: 'customers/:id/edit',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./customers/customer-form.page').then((m) => m.CustomerFormPage),
   },
   {
     path: 'catalog',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./catalog/catalog-list.page').then((m) => m.CatalogListPage),
   },
   {
     path: 'catalog/new',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./catalog/catalog-form.page').then((m) => m.CatalogFormPage),
   },
   {
     path: 'catalog/:id/edit',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./catalog/catalog-form.page').then((m) => m.CatalogFormPage),
   },
   {
     path: 'quotations',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./quotations/quotation-list.page').then(
         (m) => m.QuotationListPage,
@@ -52,6 +72,7 @@ export const appRoutes: Routes = [
   },
   {
     path: 'quotations/new',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./quotations/quotation-form.page').then(
         (m) => m.QuotationFormPage,
@@ -59,6 +80,7 @@ export const appRoutes: Routes = [
   },
   {
     path: 'quotations/:id/edit',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./quotations/quotation-form.page').then(
         (m) => m.QuotationFormPage,
@@ -66,6 +88,7 @@ export const appRoutes: Routes = [
   },
   {
     path: 'quotations/:id',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./quotations/quotation-preview.page').then(
         (m) => m.QuotationPreviewPage,
@@ -73,16 +96,19 @@ export const appRoutes: Routes = [
   },
   {
     path: 'invoices',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./invoices/invoice-list.page').then((m) => m.InvoiceListPage),
   },
   {
     path: 'invoices/:id',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./invoices/invoice-detail.page').then((m) => m.InvoiceDetailPage),
   },
   {
     path: 'reminders',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./reminders/reminder-center.page').then(
         (m) => m.ReminderCenterPage,
@@ -90,6 +116,7 @@ export const appRoutes: Routes = [
   },
   {
     path: 'analytics',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./analytics/analytics.page').then((m) => m.AnalyticsPage),
   },

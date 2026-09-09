@@ -42,8 +42,19 @@ function request_body(): array {
     return $body;
 }
 
-function authorize_request(): void {
+function authorize_request(): ?string {
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    if (preg_match('/^Bearer\s+(.+)$/i', $header, $matches)) {
+        $tokenHash = hash('sha256', trim($matches[1]));
+        $stmt = database()->prepare('SELECT account_id FROM api_sessions WHERE token_hash = :token_hash AND expires_at > NOW() LIMIT 1');
+        $stmt->execute(['token_hash' => $tokenHash]);
+        $accountId = $stmt->fetchColumn();
+        if (!$accountId) json_response(['message' => 'Session expired or invalid.'], 401);
+        database()->prepare('UPDATE api_sessions SET last_used_at = NOW() WHERE token_hash = :token_hash')->execute(['token_hash' => $tokenHash]);
+        return (string) $accountId;
+    }
     $expected = env_value('API_KEY');
     $provided = $_SERVER['HTTP_X_API_KEY'] ?? '';
     if (!$expected || !hash_equals($expected, $provided)) json_response(['message' => 'Unauthorized.'], 401);
+    return null;
 }

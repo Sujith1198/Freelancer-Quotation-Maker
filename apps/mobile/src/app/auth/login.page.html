@@ -1,0 +1,113 @@
+<ion-content [fullscreen]="true">
+  <main class="auth-shell">
+    <section class="intro">
+      <div class="logo"><ion-icon name="flash" /></div>
+      <span class="version">QUOTESWIFT V12</span>
+      <h1>{{ registerMode() ? 'Create your workspace' : 'Welcome back' }}</h1>
+      <p>
+        {{ registerMode() ? 'Start quoting, invoicing and collecting payments
+        from one secure account.' : 'Sign in to continue running your business
+        from anywhere.' }}
+      </p>
+      <div class="trust-row">
+        <span
+          ><ion-icon name="shield-checkmark-outline" /> Protected access</span
+        >
+        <span><ion-icon name="checkmark-circle" /> Offline ready</span>
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <div class="mode-tabs">
+        <button
+          [class.active]="!registerMode()"
+          (click)="registerMode.set(false)"
+        >
+          Sign in
+        </button>
+        <button
+          [class.active]="registerMode()"
+          (click)="registerMode.set(true)"
+        >
+          Create account
+        </button>
+      </div>
+
+      <form (ngSubmit)="submit()">
+        @if (registerMode()) {
+        <label>Full name</label>
+        <div class="field">
+          <ion-icon name="person-outline" /><ion-input
+            name="name"
+            [(ngModel)]="name"
+            placeholder="Sujith Kumar"
+            autocomplete="name"
+          />
+        </div>
+        <label>Business name <small>optional</small></label>
+        <div class="field">
+          <ion-icon name="business-outline" /><ion-input
+            name="business"
+            [(ngModel)]="businessName"
+            placeholder="Your business"
+            autocomplete="organization"
+          />
+        </div>
+        }
+        <label>Email address</label>
+        <div class="field">
+          <ion-icon name="mail-outline" /><ion-input
+            name="email"
+            [(ngModel)]="email"
+            type="email"
+            placeholder="you@business.com"
+            autocomplete="email"
+          />
+        </div>
+        <label>Password</label>
+        <div class="field">
+          <ion-icon name="lock-closed-outline" /><ion-input
+            name="password"
+            [(ngModel)]="password"
+            [type]="revealPassword() ? 'text' : 'password'"
+            placeholder="Minimum 8 characters"
+            [autocomplete]="registerMode() ? 'new-password' : 'current-password'"
+          /><button
+            type="button"
+            class="reveal"
+            (click)="revealPassword.update(v => !v)"
+            [attr.aria-label]="revealPassword() ? 'Hide password' : 'Show password'"
+          >
+            <ion-icon
+              [name]="revealPassword() ? 'eye-off-outline' : 'eye-outline'"
+            />
+          </button>
+        </div>
+        @if (registerMode() && password) {
+        <div class="strength">
+          <span [style.width.%]="strength() * 20"></span>
+        </div>
+        <small class="hint"
+          >Use uppercase, lowercase, a number and a symbol.</small
+        >
+        } @if (error()) {
+        <p class="error">{{ error() }}</p>
+        }
+        <ion-button expand="block" type="submit" [disabled]="busy()">
+          @if (busy()) { <ion-spinner name="crescent" /> } @else { {{
+          registerMode() ? 'Create secure account' : 'Sign in' }}
+          <ion-icon slot="end" name="arrow-forward" /> }
+        </ion-button>
+      </form>
+
+      <div class="divider"><span>or</span></div>
+      <button class="offline" type="button" (click)="useOffline()">
+        Continue offline on this device
+      </button>
+      <p class="privacy">
+        Offline mode keeps business data on this device. You can create an
+        account later.
+      </p>
+    </section>
+  </main>
+</ion-content>

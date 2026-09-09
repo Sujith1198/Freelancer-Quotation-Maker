@@ -73,6 +73,10 @@ button {
   color: var(--ink);
   font-size: 21px;
 }
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
 .notification-dot {
   position: absolute;
   top: 9px;

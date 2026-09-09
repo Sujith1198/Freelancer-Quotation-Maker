@@ -15,17 +15,26 @@
           <h1>{{ businessProfile()?.businessName || 'QuoteSwift' }}</h1>
         </div>
       </div>
-      <button
-        class="icon-button ion-activatable"
-        aria-label="Reminders"
-        routerLink="/reminders"
-      >
-        <ion-icon name="notifications-outline" /><span
-          class="notification-dot"
-          [class.hidden]="activeReminderCount===0"
-        ></span
-        ><ion-ripple-effect />
-      </button>
+      <div class="header-actions">
+        <button
+          class="icon-button ion-activatable"
+          aria-label="My account"
+          routerLink="/account"
+        >
+          <ion-icon name="person-circle-outline" /><ion-ripple-effect />
+        </button>
+        <button
+          class="icon-button ion-activatable"
+          aria-label="Reminders"
+          routerLink="/reminders"
+        >
+          <ion-icon name="notifications-outline" /><span
+            class="notification-dot"
+            [class.hidden]="activeReminderCount===0"
+          ></span
+          ><ion-ripple-effect />
+        </button>
+      </div>
     </header>
     <section class="hero-card">
       <div class="hero-copy">

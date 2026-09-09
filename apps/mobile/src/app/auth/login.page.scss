@@ -1,0 +1,219 @@
+:host {
+  display: block;
+  --ink: #14203a;
+  --muted: #73809a;
+}
+ion-content {
+  --background: linear-gradient(160deg, #eef3ff 0%, #f8faff 48%, #fff 100%);
+}
+.auth-shell {
+  max-width: 520px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: calc(36px + var(--ion-safe-area-top)) 20px 42px;
+}
+.intro {
+  text-align: center;
+}
+.logo {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 14px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 30px;
+  background: linear-gradient(145deg, #5b83f6, #2856dc);
+  box-shadow: 0 16px 32px rgba(48, 91, 218, 0.27);
+}
+.version {
+  color: #3768ed;
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  font-weight: 900;
+}
+h1 {
+  margin: 9px 0 7px;
+  color: var(--ink);
+  font-size: 30px;
+  letter-spacing: -0.8px;
+}
+.intro > p {
+  max-width: 380px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.trust-row {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 17px 0 24px;
+  color: #4d5c78;
+  font-size: 10px;
+  font-weight: 700;
+}
+.trust-row span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.trust-row ion-icon {
+  color: #36a269;
+  font-size: 15px;
+}
+.auth-card {
+  padding: 20px;
+  border: 1px solid #e7ebf4;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 20px 55px rgba(45, 64, 108, 0.11);
+}
+.mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 4px;
+  margin-bottom: 21px;
+  border-radius: 13px;
+  background: #f1f4fa;
+}
+.mode-tabs button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px;
+  color: #7a859c;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+.mode-tabs button.active {
+  color: #244fc8;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(40, 62, 108, 0.1);
+}
+label {
+  display: block;
+  margin: 13px 2px 7px;
+  color: #34415e;
+  font-size: 11px;
+  font-weight: 800;
+}
+label:first-of-type {
+  margin-top: 0;
+}
+label small {
+  color: #9aa3b5;
+  font-weight: 500;
+}
+.field {
+  display: flex;
+  align-items: center;
+  min-height: 49px;
+  padding: 0 13px;
+  border: 1px solid #dfe4ee;
+  border-radius: 14px;
+  background: #fbfcff;
+}
+.field:focus-within {
+  border-color: #7295f5;
+  box-shadow: 0 0 0 3px rgba(55, 104, 237, 0.08);
+}
+.field > ion-icon {
+  flex: 0 0 auto;
+  color: #8b96ab;
+  font-size: 18px;
+}
+.field ion-input {
+  --padding-start: 10px;
+  --padding-end: 6px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.reveal {
+  border: 0;
+  padding: 7px 0 7px 8px;
+  color: #7f8aa0;
+  background: transparent;
+  font-size: 19px;
+}
+.strength {
+  height: 4px;
+  margin: 8px 2px 5px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #e9edf4;
+}
+.strength span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #f0a441, #30ae72);
+  transition: width 0.2s;
+}
+.hint,
+.privacy {
+  color: #929caf;
+  font-size: 9px;
+  line-height: 1.45;
+}
+.error {
+  margin: 12px 2px 0;
+  color: #d34444;
+  font-size: 11px;
+  font-weight: 700;
+}
+form ion-button {
+  min-height: 48px;
+  margin: 19px 0 0;
+  --border-radius: 14px;
+  --background: linear-gradient(120deg, #2b57dc, #4d7cf4);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: none;
+}
+form ion-spinner {
+  width: 19px;
+}
+.divider {
+  position: relative;
+  height: 27px;
+  margin-top: 7px;
+  text-align: center;
+}
+.divider::before {
+  content: '';
+  position: absolute;
+  inset: 13px 0 auto;
+  border-top: 1px solid #edf0f5;
+}
+.divider span {
+  position: relative;
+  padding: 0 10px;
+  color: #a2aaba;
+  background: #fff;
+  font-size: 9px;
+}
+.offline {
+  width: 100%;
+  border: 1px solid #dce3f1;
+  border-radius: 13px;
+  padding: 13px;
+  color: #41506d;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+}
+.privacy {
+  margin: 10px 15px 0;
+  text-align: center;
+}
+@media (min-width: 760px) {
+  .auth-shell {
+    padding-top: 62px;
+  }
+}

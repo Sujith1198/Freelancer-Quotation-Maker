@@ -4,14 +4,22 @@ require __DIR__ . '/config.php';
 
 $origin = env_value('APP_ORIGIN', '');
 if ($origin) header("Access-Control-Allow-Origin: {$origin}");
-header('Access-Control-Allow-Headers: Content-Type, X-API-Key');
+header('Access-Control-Allow-Headers: Content-Type, X-API-Key, Authorization');
 header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-authorize_request();
 $method = $_SERVER['REQUEST_METHOD'];
 $path = trim((string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-$segments = explode('/', $path); $customerId = null; $productId = null; $quotationId = null; $paymentQuotationId = null; $invoiceId = null; $reminderId = null;
+$segments = explode('/', $path);
+$authPosition = array_search('auth', $segments, true);
+$authAction = $authPosition === false ? null : ($segments[$authPosition + 1] ?? null);
+if ($authPosition !== false) {
+    try { handle_auth(database(), $method, $authAction); }
+    catch (PDOException $error) { error_log($error->getMessage()); json_response(['message' => 'Account request failed.'], 500); }
+    catch (Throwable $error) { error_log($error->getMessage()); json_response(['message' => 'Server request failed.'], 500); }
+}
+$accountId = authorize_request();
+$customerId = null; $productId = null; $quotationId = null; $paymentQuotationId = null; $invoiceId = null; $reminderId = null;
 $customerPosition = array_search('customers', $segments, true);
 $productPosition = array_search('catalog', $segments, true);
 $quotationPosition = array_search('quotations', $segments, true);
@@ -25,7 +33,7 @@ if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 
 if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
 if ($invoicePosition !== false) $invoiceId = $segments[$invoicePosition + 1] ?? null;
 if ($reminderPosition !== false) $reminderId = $segments[$reminderPosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v11']);
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v12', 'authenticatedAccount' => $accountId]);
 
 try {
     $pdo = database();
@@ -58,6 +66,44 @@ try {
     json_response(['message' => 'Route not found.'], 404);
 } catch (PDOException $error) { error_log($error->getMessage()); json_response(['message' => 'Database request failed.'], 500); }
   catch (Throwable $error) { error_log($error->getMessage()); json_response(['message' => 'Server request failed.'], 500); }
+
+function handle_auth(PDO $pdo, string $method, ?string $action): never {
+    if ($method === 'POST' && $action === 'register') {
+        $body = request_body(); $name = trim((string)($body['name'] ?? '')); $email = strtolower(trim((string)($body['email'] ?? ''))); $password = (string)($body['password'] ?? '');
+        if (strlen($name) < 2 || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) json_response(['message' => 'Name, valid email and an 8 character password are required.'], 422);
+        $exists = $pdo->prepare('SELECT id FROM accounts WHERE email = :email LIMIT 1'); $exists->execute(['email' => $email]);
+        if ($exists->fetchColumn()) json_response(['message' => 'An account already exists for this email.'], 409);
+        $accountId = 'ACC-' . strtoupper(bin2hex(random_bytes(8)));
+        $stmt = $pdo->prepare('INSERT INTO accounts (id,name,business_name,email,password_hash) VALUES (:id,:name,:business_name,:email,:password_hash)');
+        $stmt->execute(['id'=>$accountId,'name'=>$name,'business_name'=>trim((string)($body['businessName']??'')),'email'=>$email,'password_hash'=>password_hash($password, PASSWORD_DEFAULT)]);
+        issue_session($pdo, $accountId, $name, $email);
+    }
+    if ($method === 'POST' && $action === 'login') {
+        $body = request_body(); $email = strtolower(trim((string)($body['email'] ?? '')));
+        $stmt = $pdo->prepare("SELECT id,name,email,password_hash FROM accounts WHERE email = :email AND status = 'active' LIMIT 1"); $stmt->execute(['email' => $email]); $account = $stmt->fetch();
+        if (!$account || !password_verify((string)($body['password'] ?? ''), $account['password_hash'])) json_response(['message' => 'Email or password is incorrect.'], 401);
+        if (password_needs_rehash($account['password_hash'], PASSWORD_DEFAULT)) $pdo->prepare('UPDATE accounts SET password_hash=:hash WHERE id=:id')->execute(['hash'=>password_hash((string)$body['password'], PASSWORD_DEFAULT),'id'=>$account['id']]);
+        issue_session($pdo, (string)$account['id'], (string)$account['name'], (string)$account['email']);
+    }
+    if ($method === 'GET' && $action === 'me') {
+        $accountId = authorize_request(); if (!$accountId) json_response(['message' => 'Bearer account session required.'], 401);
+        $stmt = $pdo->prepare('SELECT id,name,business_name,email,status,created_at FROM accounts WHERE id=:id LIMIT 1'); $stmt->execute(['id'=>$accountId]); json_response(['data'=>$stmt->fetch()]);
+    }
+    if ($method === 'POST' && $action === 'logout') {
+        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if (!preg_match('/^Bearer\s+(.+)$/i', $header, $matches)) json_response(['message'=>'Bearer token required.'],401);
+        $pdo->prepare('DELETE FROM api_sessions WHERE token_hash=:token_hash')->execute(['token_hash'=>hash('sha256',trim($matches[1]))]); json_response(['message'=>'Logged out.']);
+    }
+    json_response(['message' => 'Auth route not found.'], 404);
+}
+
+function issue_session(PDO $pdo, string $accountId, string $name, string $email): never {
+    $token = bin2hex(random_bytes(32)); $id = 'SES-' . strtoupper(bin2hex(random_bytes(8)));
+    $pdo->prepare('DELETE FROM api_sessions WHERE expires_at <= NOW()')->execute();
+    $stmt = $pdo->prepare('INSERT INTO api_sessions (id,account_id,token_hash,expires_at) VALUES (:id,:account_id,:token_hash,DATE_ADD(NOW(), INTERVAL 30 DAY))');
+    $stmt->execute(['id'=>$id,'account_id'=>$accountId,'token_hash'=>hash('sha256',$token)]);
+    json_response(['data'=>['token'=>$token,'expiresIn'=>2592000,'account'=>['id'=>$accountId,'name'=>$name,'email'=>$email]]],201);
+}
 
 function validate_customer(array $body): void {
     $errors = [];
