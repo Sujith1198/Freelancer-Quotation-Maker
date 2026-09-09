@@ -10,7 +10,7 @@ Endpoints: `GET/POST /customers`, `PUT/DELETE /customers/{id}`, `GET/POST
 order. Every request
 must send the server-side `X-API-Key`. Replace this temporary V3 API-key layer
 with account authentication for new integrations. Import SQL files through
-`008_create_cloud_snapshots.sql` in numeric order.
+`009_create_subscriptions.sql` in numeric order.
 
 V5 also adds `GET/POST /quotations` and `GET/PUT/DELETE /quotations/{id}`.
 Quotation headers and line items are written in one transaction. Import
@@ -25,3 +25,7 @@ Registration and login return an expiring token; send it as
 V13 adds authenticated `GET /sync` and `PUT /sync` endpoints for account-scoped
 business snapshots. Only the documented QuoteSwift storage keys are accepted,
 and each snapshot is limited to 5 MB.
+
+V14 adds authenticated `GET /billing` subscription status and the subscription
+schema required for a future verified Google Play webhook. Client requests
+cannot directly grant themselves Pro access.

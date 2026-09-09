@@ -126,5 +126,11 @@ export const appRoutes: Routes = [
     loadComponent: () =>
       import('./sync/cloud-sync.page').then((m) => m.CloudSyncPage),
   },
+  {
+    path: 'upgrade',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./billing/upgrade.page').then((m) => m.UpgradePage),
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -28,17 +28,19 @@ $invoicePosition = array_search('invoices', $segments, true);
 $reminderPosition = array_search('reminders', $segments, true);
 $analyticsPosition = array_search('analytics', $segments, true);
 $syncPosition = array_search('sync', $segments, true);
+$billingPosition = array_search('billing', $segments, true);
 if ($customerPosition !== false) $customerId = $segments[$customerPosition + 1] ?? null;
 if ($productPosition !== false) $productId = $segments[$productPosition + 1] ?? null;
 if ($quotationPosition !== false) $quotationId = $segments[$quotationPosition + 1] ?? null;
 if ($paymentPosition !== false) $paymentQuotationId = $segments[$paymentPosition + 1] ?? null;
 if ($invoicePosition !== false) $invoiceId = $segments[$invoicePosition + 1] ?? null;
 if ($reminderPosition !== false) $reminderId = $segments[$reminderPosition + 1] ?? null;
-if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false && $syncPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v13', 'authenticatedAccount' => $accountId]);
+if ($customerPosition === false && $productPosition === false && $quotationPosition === false && $paymentPosition === false && $invoicePosition === false && $reminderPosition === false && $analyticsPosition === false && $syncPosition === false && $billingPosition === false) json_response(['name' => 'QuoteSwift API', 'version' => 'v14', 'authenticatedAccount' => $accountId]);
 
 try {
     $pdo = database();
     if ($syncPosition !== false) handle_sync($pdo, $method, $accountId);
+    if ($billingPosition !== false) handle_billing($pdo, $method, $accountId);
     if ($productPosition !== false) handle_catalog($pdo, $method, $productId);
     if ($paymentPosition !== false) handle_payments($pdo, $method, $paymentQuotationId);
     if ($invoicePosition !== false) handle_invoices($pdo, $method, $invoiceId);
@@ -126,6 +128,15 @@ function handle_sync(PDO $pdo, string $method, ?string $accountId): never {
         json_response(['data'=>['revision'=>$revision,'updatedAt'=>date('c'),'records'=>$records],'message'=>'Cloud backup updated.']);
     }
     json_response(['message'=>'Method not allowed.'],405);
+}
+
+function handle_billing(PDO $pdo, string $method, ?string $accountId): never {
+    if (!$accountId) json_response(['message'=>'Bearer account session required.'],401);
+    if ($method !== 'GET') json_response(['message'=>'Subscription updates must come from a verified store webhook.'],405);
+    $stmt=$pdo->prepare('SELECT plan_code,provider,status,current_period_end,updated_at FROM subscriptions WHERE account_id=:account_id LIMIT 1');
+    $stmt->execute(['account_id'=>$accountId]); $subscription=$stmt->fetch();
+    if(!$subscription) json_response(['data'=>['planCode'=>'free','provider'=>null,'status'=>'active','currentPeriodEnd'=>null]]);
+    json_response(['data'=>['planCode'=>$subscription['plan_code'],'provider'=>$subscription['provider'],'status'=>$subscription['status'],'currentPeriodEnd'=>$subscription['current_period_end'],'updatedAt'=>$subscription['updated_at']]]);
 }
 
 function validate_customer(array $body): void {

@@ -1,0 +1,110 @@
+<ion-content [fullscreen]="true"
+  ><main class="plan-shell">
+    <header>
+      <ion-button fill="clear" routerLink="/" aria-label="Back"
+        ><ion-icon slot="icon-only" name="arrow-back"
+      /></ion-button>
+      <div>
+        <span>V14 PLANS</span>
+        <h1>Choose your plan</h1>
+      </div>
+    </header>
+    <section class="hero">
+      <div class="crown"><ion-icon name="ribbon-outline" /></div>
+      <span>QUOTESWIFT PRO</span>
+      <h2>Run your business without limits</h2>
+      <p>
+        Professional quoting, invoices, analytics and cloud protection in one
+        mobile workspace.
+      </p>
+    </section>
+    @if (plans.isPro()) {
+    <section class="active">
+      <ion-icon name="checkmark-circle" />
+      <div>
+        <small>ACTIVE PLAN</small><strong>{{ plans.planName() }}</strong>
+        <p>
+          {{ plans.entitlement().source === 'trial' ? plans.remainingDays() + '
+          trial days remaining' : 'Subscription active' }}
+        </p>
+      </div>
+    </section>
+    } @else {
+    <section class="usage">
+      <div class="usage-head">
+        <div><small>CURRENT PLAN</small><strong>Free</strong></div>
+        <span>Starter</span>
+      </div>
+      <article>
+        <div><ion-icon name="people-outline" /><span>Customers</span></div>
+        <strong>{{ usage.customers }} / {{ plans.limits.customers }}</strong>
+      </article>
+      <article>
+        <div>
+          <ion-icon name="document-text-outline" /><span
+            >Quotes this month</span
+          >
+        </div>
+        <strong
+          >{{ usage.quotations }} / {{ plans.limits.quotationsPerMonth
+          }}</strong
+        >
+      </article>
+    </section>
+    }
+    <section class="compare">
+      <article>
+        <div class="plan-title">
+          <h3>Free</h3>
+          <strong>₹0</strong>
+        </div>
+        <ul>
+          <li><ion-icon name="checkmark-circle" />25 customers</li>
+          <li><ion-icon name="checkmark-circle" />10 quotations / month</li>
+          <li><ion-icon name="checkmark-circle" />PDF and WhatsApp sharing</li>
+          <li><ion-icon name="checkmark-circle" />On-device storage</li>
+        </ul>
+      </article>
+      <article class="pro">
+        <span class="popular">BEST VALUE</span>
+        <div class="plan-title">
+          <h3>Pro</h3>
+          <strong>₹199<small>/month</small></strong>
+        </div>
+        <ul>
+          <li>
+            <ion-icon name="checkmark-circle" />Unlimited customers & quotes
+          </li>
+          <li>
+            <ion-icon name="checkmark-circle" />Invoices, receipts & analytics
+          </li>
+          <li><ion-icon name="checkmark-circle" />Cloud backup and restore</li>
+          <li><ion-icon name="checkmark-circle" />Smart reminders</li>
+        </ul>
+        @if (!plans.isPro() && plans.trialAvailable()) {
+        <ion-button expand="block" (click)="startTrial()"
+          ><ion-icon slot="start" name="sparkles-outline" />Start 7-day demo
+          trial</ion-button
+        >
+        } @else if (!plans.isPro()) {
+        <ion-button expand="block" disabled
+          >Google Play billing coming next</ion-button
+        >
+        }
+      </article>
+    </section>
+    @if (started()) {
+    <p class="success">
+      <ion-icon name="flash" /> Pro demo activated. No payment was charged.
+    </p>
+    }
+    <section class="notice">
+      <ion-icon name="shield-checkmark-outline" />
+      <p>
+        <strong>No charge in V14.</strong> The trial demonstrates entitlement
+        controls. Production subscriptions must be verified through Google Play
+        Billing before Play Store release.
+      </p>
+    </section>
+  </main></ion-content
+>
